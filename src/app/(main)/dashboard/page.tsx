@@ -5,7 +5,7 @@ import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '
 
 // 模拟数据 - 实际应从API获取
 const mockUser = {
-  name: '学習者',
+  name: '学习者',
   level: 5,
   exp: 350,
   expToNext: 500,
@@ -13,7 +13,7 @@ const mockUser = {
 };
 
 const mockPet = {
-  name: 'ハチ',
+  name: '小柴',
   species: 'dog',
   level: 8,
   happiness: 85,
@@ -21,10 +21,10 @@ const mockPet = {
 };
 
 const dailyGoals = [
-  { id: 1, name: '仮名を5つ学ぶ', completed: true, exp: 50 },
-  { id: 2, name: '単語を10個復習', completed: true, exp: 50 },
-  { id: 3, name: '文法を1つ学ぶ', completed: false, exp: 30 },
-  { id: 4, name: 'AIと会話練習', completed: false, exp: 40 },
+  { id: 1, name: '学习5个假名', completed: true, exp: 50 },
+  { id: 2, name: '复习10个单词', completed: true, exp: 50 },
+  { id: 3, name: '学习1个语法点', completed: false, exp: 30 },
+  { id: 4, name: 'AI对话练习', completed: false, exp: 40 },
 ];
 
 export default function DashboardPage() {
@@ -41,7 +41,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <PixelBadge variant="level">Lv.{mockUser.level}</PixelBadge>
-            <PixelBadge variant="exp">🔥 {mockUser.streak}日連続</PixelBadge>
+            <PixelBadge variant="exp">🔥 连续{mockUser.streak}天</PixelBadge>
             <div className="w-10 h-10 bg-[#FFD700] border-3 border-black rounded-full flex items-center justify-center">
               <span className="text-sm">👤</span>
             </div>
@@ -53,10 +53,9 @@ export default function DashboardPage() {
         {/* Welcome Message */}
         <div className="mb-8">
           <PixelDialog>
-            <p>おかえりなさい、{mockUser.name}さん！</p>
+            <p>欢迎回来，{mockUser.name}！</p>
             <p className="text-[#666666] text-[10px] mt-2">
-              今日も一緒に日本語を勉強しましょう！
-              （欢迎回来！今天也一起学习日语吧！）
+              今天也来学习日语吧，你的宠物在等你哦！
             </p>
           </PixelDialog>
         </div>
@@ -65,11 +64,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* User Stats */}
           <PixelCard>
-            <h2 className="text-xs mb-4">学習ステータス</h2>
+            <h2 className="text-xs mb-4">学习状态</h2>
             <div className="flex flex-col gap-3">
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px]">レベル</span>
+                  <span className="text-[10px]">等级</span>
                   <span className="text-[10px]">{mockUser.level}</span>
                 </div>
                 <PixelProgress
@@ -82,8 +81,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex justify-between items-center p-3 bg-[#FFD700] border-2 border-black">
-                <span className="text-[10px]">連続学習</span>
-                <span className="text-xs font-bold">{mockUser.streak}日 🔥</span>
+                <span className="text-[10px]">连续学习</span>
+                <span className="text-xs font-bold">{mockUser.streak}天 🔥</span>
               </div>
             </div>
           </PixelCard>
@@ -108,27 +107,27 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-2 mb-4">
                   <PixelProgress
                     value={mockPet.happiness}
-                    label="幸福度"
+                    label="心情"
                     variant="exp"
                     showLabel
                   />
                   <PixelProgress
                     value={100 - mockPet.hunger}
-                    label="満腹度"
+                    label="饱腹"
                     showLabel
                   />
                 </div>
 
                 <div className="flex gap-2">
                   <PixelButton size="sm" variant="accent">
-                    🍖 餌やり
+                    🍖 喂食
                   </PixelButton>
                   <PixelButton size="sm" variant="secondary">
-                    🤗 なでる
+                    🤗 摸摸
                   </PixelButton>
                   <Link href="/pet">
                     <PixelButton size="sm">
-                      ペットを見る
+                      查看宠物
                     </PixelButton>
                   </Link>
                 </div>
@@ -139,7 +138,7 @@ export default function DashboardPage() {
 
         {/* Daily Goals */}
         <PixelCard className="mb-8">
-          <h2 className="text-xs mb-4">今日の目標</h2>
+          <h2 className="text-xs mb-4">今日目标</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {dailyGoals.map((goal) => (
               <div
@@ -160,13 +159,13 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4 text-center">
             <span className="text-[10px] text-[#666666]">
-              {dailyGoals.filter(g => g.completed).length}/{dailyGoals.length} 完了
+              已完成 {dailyGoals.filter(g => g.completed).length}/{dailyGoals.length}
             </span>
           </div>
         </PixelCard>
 
         {/* Learning Modules Grid */}
-        <h2 className="text-xs mb-4">学習モジュール</h2>
+        <h2 className="text-xs mb-4">学习模块</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Kana Module */}
           <Link href="/kana">
@@ -176,11 +175,11 @@ export default function DashboardPage() {
                   <span className="text-lg">あ</span>
                 </div>
                 <div>
-                  <h3 className="text-xs">仮名学習</h3>
-                  <p className="text-[10px] text-[#666666]">平仮名・片仮名</p>
+                  <h3 className="text-xs">假名学习</h3>
+                  <p className="text-[10px] text-[#666666]">平假名 · 片假名</p>
                 </div>
               </div>
-              <PixelProgress value={45} label="進捗" showLabel />
+              <PixelProgress value={45} label="进度" showLabel />
             </PixelCard>
           </Link>
 
@@ -192,11 +191,11 @@ export default function DashboardPage() {
                   <span className="text-lg">📖</span>
                 </div>
                 <div>
-                  <h3 className="text-xs">単語帳</h3>
-                  <p className="text-[10px] text-[#666666]">基礎単語</p>
+                  <h3 className="text-xs">单词本</h3>
+                  <p className="text-[10px] text-[#666666]">基础词汇</p>
                 </div>
               </div>
-              <PixelProgress value={30} label="進捗" variant="exp" showLabel />
+              <PixelProgress value={30} label="进度" variant="exp" showLabel />
             </PixelCard>
           </Link>
 
@@ -208,11 +207,11 @@ export default function DashboardPage() {
                   <span className="text-lg">📝</span>
                 </div>
                 <div>
-                  <h3 className="text-xs">文法入門</h3>
-                  <p className="text-[10px] text-[#666666]">基本文法</p>
+                  <h3 className="text-xs">语法入门</h3>
+                  <p className="text-[10px] text-[#666666]">基础语法</p>
                 </div>
               </div>
-              <PixelProgress value={15} label="進捗" variant="default" showLabel />
+              <PixelProgress value={15} label="进度" variant="default" showLabel />
             </PixelCard>
           </Link>
 
@@ -224,12 +223,12 @@ export default function DashboardPage() {
                   <span className="text-lg">💬</span>
                 </div>
                 <div>
-                  <h3 className="text-xs">AI会話練習</h3>
-                  <p className="text-[10px] text-[#666666]">シチュエーション別</p>
+                  <h3 className="text-xs">AI 对话练习</h3>
+                  <p className="text-[10px] text-[#666666]">场景对话</p>
                 </div>
               </div>
               <div className="text-[10px] text-[#666666]">
-                3つのシチュエーションが利用可能
+                6个场景可供练习
               </div>
             </PixelCard>
           </Link>
@@ -242,12 +241,12 @@ export default function DashboardPage() {
                   <span className="text-lg">✨</span>
                 </div>
                 <div>
-                  <h3 className="text-xs">スマートテスト</h3>
-                  <p className="text-[10px] text-[#666666]">AI生成問題</p>
+                  <h3 className="text-xs">智能测验</h3>
+                  <p className="text-[10px] text-[#666666]">AI 出题</p>
                 </div>
               </div>
               <div className="text-[10px] text-[#666666]">
-                最高スコア: 85点
+                最高分: 85
               </div>
             </PixelCard>
           </Link>
@@ -260,8 +259,8 @@ export default function DashboardPage() {
                   <span className="text-lg">🐾</span>
                 </div>
                 <div>
-                  <h3 className="text-xs">ペット</h3>
-                  <p className="text-[10px] text-[#666666]">なかまを育てよう</p>
+                  <h3 className="text-xs">我的宠物</h3>
+                  <p className="text-[10px] text-[#666666]">培养伙伴</p>
                 </div>
               </div>
               <div className="text-[10px] text-[#666666]">
@@ -276,7 +275,7 @@ export default function DashboardPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

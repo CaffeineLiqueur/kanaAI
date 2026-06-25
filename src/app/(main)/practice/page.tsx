@@ -141,23 +141,23 @@ export default function PracticePage() {
             </Link>
           </div>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← ダッシュボード</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
           </Link>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">AI会話練習</h2>
+          <h2 className="text-lg text-[#2D2D2D] mb-2">AI对话练习</h2>
           <p className="text-[10px] text-[#666666]">
-            AIと日本語で会話しよう！シチュエーション別に練習できます。
+            和AI用日语对话吧！可以选择不同场景练习。
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Scene Selection */}
           <div>
-            <h3 className="text-xs mb-4">シチュエーション選択</h3>
+            <h3 className="text-xs mb-4">选择场景</h3>
             <div className="flex flex-col gap-3">
               {scenes.map((scene) => (
                 <button
@@ -184,7 +184,7 @@ export default function PracticePage() {
                       size="sm"
                       className="ml-auto"
                     >
-                      {scene.difficulty === 'beginner' ? '初級' : '中級'}
+                      {scene.difficulty === 'beginner' ? '初级' : '中级'}
                     </PixelBadge>
                   </div>
                 </button>
@@ -231,7 +231,7 @@ export default function PracticePage() {
                   {isLoading && (
                     <div className="text-left">
                       <div className="inline-block p-3 border-2 border-black bg-[#F5F0E1]">
-                        <div className="text-xs">考え中...（思考中...）</div>
+                        <div className="text-xs">思考中...（思考中...）</div>
                       </div>
                     </div>
                   )}
@@ -244,12 +244,12 @@ export default function PracticePage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="日本語で入力してください...（请用日语输入...）"
+                    placeholder="请用日语输入...（请用日语输入...）"
                     className="flex-1 px-4 py-3 border-3 border-black font-pixel text-xs"
                     disabled={isLoading}
                   />
                   <PixelButton onClick={handleSend} disabled={isLoading}>
-                    送信
+                    发送
                   </PixelButton>
                 </div>
 
@@ -264,7 +264,7 @@ export default function PracticePage() {
             ) : (
               <PixelCard>
                 <PixelDialog>
-                  <p>シチュエーションを選んで会話を始めましょう！</p>
+                  <p>请选择一个场景开始对话！</p>
                   <p className="text-[#666666] text-[10px] mt-2">
                     （选择一个场景开始对话吧！）
                   </p>
@@ -279,7 +279,7 @@ export default function PracticePage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

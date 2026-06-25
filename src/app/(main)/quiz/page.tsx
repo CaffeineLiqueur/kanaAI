@@ -113,16 +113,16 @@ export default function QuizPage() {
             </Link>
           </div>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← ダッシュボード</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
           </Link>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">スマートテスト</h2>
+          <h2 className="text-lg text-[#2D2D2D] mb-2">智能测验</h2>
           <p className="text-[10px] text-[#666666]">
-            学習した内容をテストしよう！
+            测试你学到的内容！
           </p>
         </div>
 
@@ -131,8 +131,8 @@ export default function QuizPage() {
             {/* Progress */}
             <PixelCard className="mb-6">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs">問題 {currentQuestion + 1}/{sampleQuestions.length}</span>
-                <PixelBadge variant="exp">スコア: {score}</PixelBadge>
+                <span className="text-xs">题目 {currentQuestion + 1}/{sampleQuestions.length}</span>
+                <PixelBadge variant="exp">得分: {score}</PixelBadge>
               </div>
               <PixelProgress
                 value={currentQuestion + 1}
@@ -145,7 +145,7 @@ export default function QuizPage() {
             <PixelCard variant="elevated">
               <div className="mb-6">
                 <PixelBadge variant="level" className="mb-3">
-                  {question.type === 'choice' ? '選択問題' : '入力問題'}
+                  {question.type === 'choice' ? '選択题目' : '入力题目'}
                 </PixelBadge>
                 <h3 className="text-sm mb-2">{question.question}</h3>
                 <p className="text-[10px] text-[#666666]">{question.questionCn}</p>
@@ -232,11 +232,11 @@ export default function QuizPage() {
               <div className="flex justify-end gap-3">
                 {!showResult ? (
                   <PixelButton onClick={handleAnswer}>
-                    答える
+                    回答
                   </PixelButton>
                 ) : (
                   <PixelButton onClick={handleNext}>
-                    {currentQuestion < sampleQuestions.length - 1 ? '次の問題' : '結果を見る'}
+                    {currentQuestion < sampleQuestions.length - 1 ? '次の题目' : '查看结果'}
                   </PixelButton>
                 )}
               </div>
@@ -246,7 +246,7 @@ export default function QuizPage() {
           /* Result Screen */
           <PixelCard variant="elevated">
             <div className="text-center py-8">
-              <h3 className="text-lg mb-4">テスト結果</h3>
+              <h3 className="text-lg mb-4">测验结果</h3>
 
               <div className="w-32 h-32 mx-auto mb-6 border-4 border-black flex items-center justify-center bg-white">
                 <span className="text-4xl">
@@ -256,7 +256,7 @@ export default function QuizPage() {
 
               <div className="text-3xl mb-2">{scorePercentage}点</div>
               <p className="text-xs text-[#666666] mb-6">
-                {sampleQuestions.length}問中{score}問正解
+                {sampleQuestions.length}题中{score}题正确
               </p>
 
               <PixelProgress
@@ -269,21 +269,21 @@ export default function QuizPage() {
               <div className="flex flex-col gap-3">
                 {scorePercentage >= 80 ? (
                   <PixelDialog>
-                    <p>素晴らしい！よくできました！</p>
+                    <p>太棒了！做得很好！</p>
                     <p className="text-[#666666] text-[10px] mt-2">
                       （太棒了！做得很好！）
                     </p>
                   </PixelDialog>
                 ) : scorePercentage >= 60 ? (
                   <PixelDialog>
-                    <p>もう少し頑張りましょう！</p>
+                    <p>再努力一点吧！</p>
                     <p className="text-[#666666] text-[10px] mt-2">
                       （再努力一点吧！）
                     </p>
                   </PixelDialog>
                 ) : (
                   <PixelDialog>
-                    <p>復習してもう一度挑戦しましょう！</p>
+                    <p>复习后再挑战一次吧！</p>
                     <p className="text-[#666666] text-[10px] mt-2">
                       （复习后再挑战一次吧！）
                     </p>
@@ -296,7 +296,7 @@ export default function QuizPage() {
                   </PixelButton>
                   <Link href="/dashboard">
                     <PixelButton variant="secondary">
-                      ダッシュボードへ
+                      返回仪表板
                     </PixelButton>
                   </Link>
                 </div>
@@ -310,7 +310,7 @@ export default function QuizPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

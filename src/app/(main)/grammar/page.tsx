@@ -115,16 +115,16 @@ export default function GrammarPage() {
             </Link>
           </div>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← ダッシュボード</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
           </Link>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">文法入門</h2>
+          <h2 className="text-lg text-[#2D2D2D] mb-2">语法入门</h2>
           <p className="text-[10px] text-[#666666]">
-            日本語の基本文法を楽しく学ぼう！AIがわかりやすく説明します。
+            轻松学习日语基础语法，AI用通俗易懂的方式讲解！
           </p>
         </div>
 
@@ -132,11 +132,11 @@ export default function GrammarPage() {
         <PixelCard className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-xs mb-2">学習進捗</h3>
+              <h3 className="text-xs mb-2">学习进度</h3>
               <PixelProgress
                 value={1}
                 max={grammarData.length}
-                label="1/5 マスター"
+                label="1/5 已掌握"
                 variant="exp"
                 showLabel
               />
@@ -151,7 +151,7 @@ export default function GrammarPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Grammar List */}
           <div>
-            <h3 className="text-xs mb-4">文法リスト</h3>
+            <h3 className="text-xs mb-4">语法列表</h3>
             <div className="flex flex-col gap-3">
               {grammarData.map((grammar) => (
                 <button
@@ -202,7 +202,7 @@ export default function GrammarPage() {
                     className="w-full text-left"
                   >
                     <div className="flex items-center justify-between p-4 bg-[#FFD700] border-3 border-black">
-                      <span className="text-xs">📖 解説を{showExplanation ? '隠す' : '見る'}</span>
+                      <span className="text-xs">📖 解释{showExplanation ? '收起' : '展开'}</span>
                       <span className="text-xs">{showExplanation ? '▲' : '▼'}</span>
                     </div>
                   </button>
@@ -215,7 +215,7 @@ export default function GrammarPage() {
 
                 {/* Examples */}
                 <div className="mb-6">
-                  <h4 className="text-xs mb-3">📝 例文</h4>
+                  <h4 className="text-xs mb-3">📝 例句</h4>
                   <div className="p-4 bg-white border-3 border-black">
                     <div className="text-center mb-4">
                       <div className="text-lg mb-2">
@@ -235,7 +235,7 @@ export default function GrammarPage() {
                         onClick={handlePrevExample}
                         disabled={currentExample === 0}
                       >
-                        ← 前へ
+                        ← 上一个
                       </PixelButton>
                       <span className="text-[10px]">
                         {currentExample + 1}/{selectedGrammar.examples.length}
@@ -246,7 +246,7 @@ export default function GrammarPage() {
                         onClick={handleNextExample}
                         disabled={currentExample === selectedGrammar.examples.length - 1}
                       >
-                        次へ →
+                        下一个 →
                       </PixelButton>
                     </div>
                   </div>
@@ -254,7 +254,7 @@ export default function GrammarPage() {
 
                 {/* Tips */}
                 <div className="p-4 bg-[#87CEEB] border-3 border-black">
-                  <h4 className="text-xs mb-2">💡 ポイント</h4>
+                  <h4 className="text-xs mb-2">💡 要点</h4>
                   <p className="text-[10px] leading-relaxed">{selectedGrammar.tips}</p>
                 </div>
 
@@ -262,7 +262,7 @@ export default function GrammarPage() {
                 <div className="mt-6">
                   <Link href="/practice">
                     <PixelButton className="w-full">
-                      💬 この文法を練習する
+                      💬 练习这个语法
                     </PixelButton>
                   </Link>
                 </div>
@@ -270,7 +270,7 @@ export default function GrammarPage() {
             ) : (
               <PixelCard>
                 <PixelDialog>
-                  <p>文法を選んでください</p>
+                  <p>请选择一个语法点</p>
                   <p className="text-[#666666] text-[10px] mt-2">
                     （请选择一个语法点）
                   </p>
@@ -285,7 +285,7 @@ export default function GrammarPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

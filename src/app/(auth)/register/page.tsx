@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert('パスワードが一致しません');
+      alert('两次输入的密码不一致');
       return;
     }
     setIsLoading(true);
@@ -31,28 +31,28 @@ export default function RegisterPage() {
             <span className="text-white text-2xl">あ</span>
           </div>
           <h1 className="text-lg text-[#2D2D2D]">kanaAI</h1>
-          <p className="text-[10px] text-[#666666] mt-2">新しいアカウントを作成しよう！</p>
+          <p className="text-[10px] text-[#666666] mt-2">创建账号，开始学习</p>
         </div>
 
         {/* Register Form */}
         <PixelCard variant="elevated">
           <PixelDialog className="mb-6">
-            <p>はじめまして！</p>
-            <p className="text-[#666666] text-[10px] mt-1">（初次见面！）</p>
+            <p>你好！欢迎加入！</p>
+            <p className="text-[#666666] text-[10px] mt-1">一起开始日语学习之旅吧</p>
           </PixelDialog>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <PixelInput
-              label="名前"
+              label="昵称"
               type="text"
-              placeholder="あなたの名前"
+              placeholder="给自己起个名字吧"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
 
             <PixelInput
-              label="メールアドレス"
+              label="邮箱"
               type="email"
               placeholder="example@email.com"
               value={email}
@@ -61,9 +61,9 @@ export default function RegisterPage() {
             />
 
             <PixelInput
-              label="パスワード"
+              label="密码"
               type="password"
-              placeholder="••••••••"
+              placeholder="至少8位字符"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -71,22 +71,22 @@ export default function RegisterPage() {
             />
 
             <PixelInput
-              label="パスワード（確認）"
+              label="确认密码"
               type="password"
-              placeholder="••••••••"
+              placeholder="再次输入密码"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              error={confirmPassword && password !== confirmPassword ? 'パスワードが一致しません' : undefined}
+              error={!!confirmPassword && password !== confirmPassword ? '两次输入的密码不一致' : undefined}
             />
 
             <div className="flex items-start gap-2 text-[10px]">
               <input type="checkbox" className="w-4 h-4 border-2 border-black mt-1" required />
               <span>
-                <a href="#" className="text-[#3B82F6] hover:underline">利用規約</a>
-                と
-                <a href="#" className="text-[#3B82F6] hover:underline">プライバシーポリシー</a>
-                に同意します
+                我已阅读并同意{' '}
+                <a href="#" className="text-[#3B82F6] hover:underline">用户协议</a>
+                {' '}和{' '}
+                <a href="#" className="text-[#3B82F6] hover:underline">隐私政策</a>
               </span>
             </div>
 
@@ -95,15 +95,15 @@ export default function RegisterPage() {
               className="w-full"
               disabled={isLoading || (!!confirmPassword && password !== confirmPassword)}
             >
-              {isLoading ? '読み込み中...' : '新規登録'}
+              {isLoading ? '注册中...' : '免费注册'}
             </PixelButton>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-[10px] text-[#666666]">
-              すでにアカウントをお持ちですか？{' '}
+              已有账号？{' '}
               <Link href="/login" className="text-[#3B82F6] hover:underline">
-                ログイン
+                立即登录
               </Link>
             </p>
           </div>
@@ -112,7 +112,7 @@ export default function RegisterPage() {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/" className="text-[10px] text-[#666666] hover:text-[#2D2D2D]">
-            ← ホームに戻る
+            ← 返回首页
           </Link>
         </div>
       </div>

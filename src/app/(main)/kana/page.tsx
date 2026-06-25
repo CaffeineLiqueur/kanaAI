@@ -113,7 +113,7 @@ export default function KanaPage() {
             </Link>
           </div>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← ダッシュボード</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
           </Link>
         </div>
       </header>
@@ -121,9 +121,9 @@ export default function KanaPage() {
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Title */}
         <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">仮名学習</h2>
+          <h2 className="text-lg text-[#2D2D2D] mb-2">假名学习</h2>
           <p className="text-[10px] text-[#666666]">
-            日本語の文字を楽しく学ぼう！図鑑のように_collecting_しよう！
+            轻松掌握日语假名，像收集图鉴一样有趣！
           </p>
         </div>
 
@@ -131,20 +131,20 @@ export default function KanaPage() {
         <PixelCard className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-xs mb-2">学習進捗</h3>
+              <h3 className="text-xs mb-2">学习进度</h3>
               <PixelProgress
                 value={progressPercentage}
-                label={`${masteredCount}/${currentData.length} マスター`}
+                label={`${masteredCount}/${currentData.length} 已掌握`}
                 variant="exp"
                 showLabel
               />
             </div>
             <div className="flex gap-4">
               <PixelBadge variant="exp">
-                マスター: {masteredCount}
+                已掌握: {masteredCount}
               </PixelBadge>
               <PixelBadge variant="default">
-                未学習: {currentData.length - masteredCount}
+                未学习: {currentData.length - masteredCount}
               </PixelBadge>
             </div>
           </div>
@@ -217,21 +217,21 @@ export default function KanaPage() {
 
                 <div className="flex flex-col gap-3 mb-6">
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">文字</span>
+                    <span className="text-[10px]">假名</span>
                     <span className="text-xs">{selectedKana.char}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">ローマ字</span>
+                    <span className="text-[10px]">罗马音</span>
                     <span className="text-xs">{selectedKana.romaji}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">グループ</span>
+                    <span className="text-[10px]">分组</span>
                     <span className="text-xs">{selectedKana.group}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">ステータス</span>
+                    <span className="text-[10px]">状态</span>
                     <PixelBadge variant={mockProgress[selectedKana.char] ? 'success' : 'default'}>
-                      {mockProgress[selectedKana.char] ? 'マスター済み' : '未学習'}
+                      {mockProgress[selectedKana.char] ? '已掌握済み' : '未学习'}
                     </PixelBadge>
                   </div>
                 </div>
@@ -239,18 +239,18 @@ export default function KanaPage() {
                 {/* Quiz Section */}
                 {showQuiz ? (
                   <div className="p-4 bg-[#FFD700] border-3 border-black">
-                    <h4 className="text-xs mb-3">クイズ！</h4>
-                    <p className="text-[10px] mb-3">「{selectedKana.char}」のローマ字は？</p>
+                    <h4 className="text-xs mb-3">小测验！</h4>
+                    <p className="text-[10px] mb-3">「{selectedKana.char}」的罗马音是？</p>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         value={quizAnswer}
                         onChange={(e) => setQuizAnswer(e.target.value)}
                         className="flex-1 px-3 py-2 border-2 border-black font-pixel text-xs"
-                        placeholder="ローマ字を入力..."
+                        placeholder="输入罗马音..."
                       />
                       <PixelButton size="sm" onClick={handleQuizSubmit}>
-                        答える
+                        回答
                       </PixelButton>
                     </div>
                     {quizFeedback && (
@@ -258,22 +258,22 @@ export default function KanaPage() {
                         quizFeedback === 'correct' ? 'bg-[#4ADE80]' : 'bg-[#EF4444] text-white'
                       }`}>
                         {quizFeedback === 'correct'
-                          ? '🎉 正解！すごい！（正确！太棒了！）'
-                          : `❌ 不正解。正解は「${selectedKana.romaji}」です（错误。正确答案是「${selectedKana.romaji}」）`
+                          ? '🎉 回答正确！すごい！（正确！太棒了！）'
+                          : `❌ 回答错误。正解は「${selectedKana.romaji}」です（错误。正确答案是「${selectedKana.romaji}」）`
                         }
                       </div>
                     )}
                   </div>
                 ) : (
                   <PixelButton className="w-full" onClick={handleStartQuiz}>
-                    クイズに挑戦！
+                    开始测验！
                   </PixelButton>
                 )}
               </PixelCard>
             ) : (
               <PixelCard>
                 <PixelDialog>
-                  <p>仮名を選んでください</p>
+                  <p>请选择一个假名</p>
                   <p className="text-[#666666] text-[10px] mt-2">
                     （请选择一个假名）
                   </p>
@@ -288,7 +288,7 @@ export default function KanaPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

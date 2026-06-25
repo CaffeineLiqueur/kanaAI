@@ -20,10 +20,10 @@ export default function Home() {
           </div>
           <nav className="flex items-center gap-4">
             <Link href="/login">
-              <PixelButton variant="ghost" size="sm">ログイン</PixelButton>
+              <PixelButton variant="ghost" size="sm">登录</PixelButton>
             </Link>
             <Link href="/register">
-              <PixelButton size="sm">新規登録</PixelButton>
+              <PixelButton size="sm">注册</PixelButton>
             </Link>
           </nav>
         </div>
@@ -36,20 +36,17 @@ export default function Home() {
           <div className="mb-12">
             <PixelDialog>
               <p className="mb-4">
-                ようこそ！kanaAIへ！
+                欢迎来到 kanaAI！
               </p>
               <p className="mb-4">
-                これは日本語を学ぶためのアプリです。
-                AIとペットと一緒に、楽しく日本語を学びましょう！
-              </p>
-              <p className="text-[#666666] text-[10px]">
-                （欢迎来到kanaAI！这是一个学习日语的应用。让我们和AI还有宠物一起快乐地学习日语吧！）
+                这是一个专为零基础学习者打造的日语学习应用。
+                AI 老师会陪伴你，还有可爱的像素宠物和你一起成长！
               </p>
               <button
                 onClick={() => setShowWelcome(false)}
                 className="mt-4 font-pixel text-[10px] text-[#3B82F6] hover:underline"
               >
-                閉じる ×
+                关闭 ×
               </button>
             </PixelDialog>
           </div>
@@ -58,20 +55,20 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h2 className="text-2xl text-[#2D2D2D] mb-6 leading-relaxed">
-            日本語を
-            <span className="text-[#FF1C1C]">楽しく</span>
-            学ぼう！
+            零基础也能
+            <span className="text-[#FF1C1C]">轻松</span>
+            学日语！
           </h2>
           <p className="text-xs text-[#666666] mb-8 max-w-md mx-auto leading-relaxed">
-            AIがあなたの質問に答えてくれます。
-            像素風のペットと一緒に、毎日楽しく学習しましょう！
+            AI 老师随时解答你的问题，像素宠物陪你一起学习，
+            让日语学习变得像玩游戏一样有趣！
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/register">
-              <PixelButton size="lg">今すぐ始める</PixelButton>
+              <PixelButton size="lg">免费开始学习</PixelButton>
             </Link>
             <Link href="/login">
-              <PixelButton variant="secondary" size="lg">ログイン</PixelButton>
+              <PixelButton variant="secondary" size="lg">我已有账号</PixelButton>
             </Link>
           </div>
         </div>
@@ -85,13 +82,9 @@ export default function Home() {
                 <span className="text-lg">あ</span>
               </div>
               <div>
-                <h3 className="text-xs mb-2">仮名学習</h3>
+                <h3 className="text-xs mb-2">假名学习</h3>
                 <p className="text-[10px] text-[#666666] leading-relaxed">
-                  平仮名と片仮名を楽しく学ぼう！
-                  図鑑のように_collecting_しよう！
-                </p>
-                <p className="text-[10px] text-[#999999] mt-2">
-                  （学习平假名和片假名！像图鉴一样收集吧！）
+                  平假名、片假名轻松掌握，像收集图鉴一样有趣！
                 </p>
               </div>
             </div>
@@ -104,13 +97,9 @@ export default function Home() {
                 <span className="text-lg">📖</span>
               </div>
               <div>
-                <h3 className="text-xs mb-2">単語帳</h3>
+                <h3 className="text-xs mb-2">单词记忆</h3>
                 <p className="text-[10px] text-[#666666] leading-relaxed">
-                  基本的な単語を効率よく覚えよう！
-                  エビングハウスの忘却曲線で復習！
-                </p>
-                <p className="text-[10px] text-[#999999] mt-2">
-                  （高效记忆基础单词！艾宾浩斯遗忘曲线复习！）
+                  基础词汇高效记忆，智能复习对抗遗忘曲线！
                 </p>
               </div>
             </div>
@@ -123,13 +112,9 @@ export default function Home() {
                 <span className="text-lg">📝</span>
               </div>
               <div>
-                <h3 className="text-xs mb-2">文法入門</h3>
+                <h3 className="text-xs mb-2">语法入门</h3>
                 <p className="text-[10px] text-[#666666] leading-relaxed">
-                  AIが基本文法をわかりやすく説明！
-                  中国語との違いも比較！
-                </p>
-                <p className="text-[10px] text-[#999999] mt-2">
-                  （AI用易懂的方式解释基础语法！对比中文差异！）
+                  AI 用通俗易懂的方式讲解语法，对比中文差异！
                 </p>
               </div>
             </div>
@@ -142,13 +127,9 @@ export default function Home() {
                 <span className="text-lg">💬</span>
               </div>
               <div>
-                <h3 className="text-xs mb-2">AI会話練習</h3>
+                <h3 className="text-xs mb-2">AI 对话练习</h3>
                 <p className="text-[10px] text-[#666666] leading-relaxed">
-                  AIと日本語で会話しよう！
-                  シチュエーション別に練習！
-                </p>
-                <p className="text-[10px] text-[#999999] mt-2">
-                  （和AI用日语对话吧！分场景练习！）
+                  多种场景模拟对话，实时纠错，轻松开口说日语！
                 </p>
               </div>
             </div>
@@ -161,13 +142,9 @@ export default function Home() {
                 <span className="text-lg">✨</span>
               </div>
               <div>
-                <h3 className="text-xs mb-2">スマートテスト</h3>
+                <h3 className="text-xs mb-2">智能测验</h3>
                 <p className="text-[10px] text-[#666666] leading-relaxed">
-                  AIが学習進度に合わせて問題生成！
-                  苦手分野を自動で特定！
-                </p>
-                <p className="text-[10px] text-[#999999] mt-2">
-                  （AI根据学习进度生成题目！自动识别薄弱环节！）
+                  AI 根据你的进度出题，自动识别薄弱环节！
                 </p>
               </div>
             </div>
@@ -180,13 +157,9 @@ export default function Home() {
                 <span className="text-lg">🐾</span>
               </div>
               <div>
-                <h3 className="text-xs mb-2">ペットシステム</h3>
+                <h3 className="text-xs mb-2">像素宠物</h3>
                 <p className="text-[10px] text-[#666666] leading-relaxed">
-                  像素風ペットと一緒に学習！
-                  レベルアップで進化！
-                </p>
-                <p className="text-[10px] text-[#999999] mt-2">
-                  （和像素风宠物一起学习！升级进化！）
+                  领养可爱宠物，学习获得经验，陪伴你一起成长！
                 </p>
               </div>
             </div>
@@ -195,7 +168,7 @@ export default function Home() {
 
         {/* Pet Preview Section */}
         <div className="text-center mb-16">
-          <h3 className="text-sm text-[#2D2D2D] mb-6">ペットに会おう！</h3>
+          <h3 className="text-sm text-[#2D2D2D] mb-6">选择你的学习伙伴</h3>
           <div className="flex justify-center gap-8">
             {/* Dog */}
             <PixelCard padding="sm" className="w-32">
@@ -203,7 +176,7 @@ export default function Home() {
                 <span className="text-3xl">🐕</span>
               </div>
               <p className="text-[10px]">柴犬</p>
-              <p className="text-[10px] text-[#666666]">しばいぬ</p>
+              <p className="text-[10px] text-[#666666]">活泼可爱</p>
             </PixelCard>
 
             {/* Cat */}
@@ -211,8 +184,8 @@ export default function Home() {
               <div className="w-20 h-20 mx-auto bg-[#FFD700] border-2 border-black mb-3 flex items-center justify-center">
                 <span className="text-3xl">🐱</span>
               </div>
-              <p className="text-[10px]">猫</p>
-              <p className="text-[10px] text-[#666666]">ねこ</p>
+              <p className="text-[10px]">猫咪</p>
+              <p className="text-[10px] text-[#666666]">优雅傲娇</p>
             </PixelCard>
 
             {/* Rabbit */}
@@ -220,8 +193,8 @@ export default function Home() {
               <div className="w-20 h-20 mx-auto bg-[#FFD700] border-2 border-black mb-3 flex items-center justify-center">
                 <span className="text-3xl">🐰</span>
               </div>
-              <p className="text-[10px]">兎</p>
-              <p className="text-[10px] text-[#666666]">うさぎ</p>
+              <p className="text-[10px]">兔子</p>
+              <p className="text-[10px] text-[#666666]">软萌治愈</p>
             </PixelCard>
           </div>
         </div>
@@ -230,14 +203,14 @@ export default function Home() {
         <div className="text-center">
           <PixelCard variant="elevated" className="inline-block px-12 py-8">
             <h3 className="text-sm text-[#2D2D2D] mb-4">
-              さあ、始めよう！
+              准备好了吗？
             </h3>
             <p className="text-[10px] text-[#666666] mb-6">
-              （来吧，开始吧！）
+              免费注册，开始你的日语学习之旅！
             </p>
             <Link href="/register">
               <PixelButton size="lg" variant="accent">
-                無料で始める
+                立即免费注册
               </PixelButton>
             </Link>
           </PixelCard>
@@ -248,7 +221,7 @@ export default function Home() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 日本語を楽しく学ぼう！
+            © 2024 kanaAI - 让日语学习变得有趣！
           </p>
         </div>
       </footer>

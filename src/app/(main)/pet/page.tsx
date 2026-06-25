@@ -58,7 +58,7 @@ export default function PetPage() {
     const newEvolution = getEvolutionStage(pet.level);
     if (newEvolution !== pet.evolution) {
       setPet(prev => ({ ...prev, evolution: newEvolution as 1 | 2 | 3 }));
-      setShowMessage(`🎉 ${pet.name}が進化しました！ステージ${newEvolution}に！`);
+      setShowMessage(`🎉 ${pet.name}进化了！阶段${newEvolution}！`);
       setTimeout(() => setShowMessage(''), 3000);
     }
   }, [pet.level]);
@@ -66,7 +66,7 @@ export default function PetPage() {
   // 喂食
   const handleFeed = () => {
     if (coins < 10) {
-      setShowMessage('💰 コインが足りません！（金币不足！）');
+      setShowMessage('💰 金币不足！（金币不足！）');
       setTimeout(() => setShowMessage(''), 2000);
       return;
     }
@@ -79,7 +79,7 @@ export default function PetPage() {
       happiness: Math.min(100, prev.happiness + 10),
     }));
 
-    setShowMessage('🍖 おいしい！ありがとう！（好吃！谢谢！）');
+    setShowMessage('🍖 好吃！谢谢！（好吃！谢谢！）');
     setTimeout(() => {
       setState('idle');
       setShowMessage('');
@@ -94,7 +94,7 @@ export default function PetPage() {
       happiness: Math.min(100, prev.happiness + 15),
     }));
 
-    setShowMessage('❤️ くすぐったい！嬉しい！（好痒！好开心！）');
+    setShowMessage('❤️ 好痒！好开心！（好痒！好开心！）');
     setTimeout(() => {
       setState('idle');
       setShowMessage('');
@@ -114,13 +114,13 @@ export default function PetPage() {
         level: prev.level + 1,
         exp: newExp - expToNext,
       }));
-      setShowMessage(`🎊 レベルアップ！Lv.${pet.level + 1}に！`);
+      setShowMessage(`🎊 等级アップ！Lv.${pet.level + 1}！`);
     } else {
       setPet(prev => ({
         ...prev,
         exp: newExp,
       }));
-      setShowMessage(`📚 +${expGain} EXP！頑張った！（努力了！）`);
+      setShowMessage(`📚 +${expGain}  EXP！努力了！（努力了！）`);
     }
 
     setTimeout(() => {
@@ -137,7 +137,7 @@ export default function PetPage() {
       hunger: Math.min(100, prev.hunger + 10),
     }));
 
-    setShowMessage('💤 おやすみ...（晚安...）');
+    setShowMessage('💤 睡觉...（晚安...）');
     setTimeout(() => {
       setState('idle');
       setShowMessage('');
@@ -145,7 +145,7 @@ export default function PetPage() {
   };
 
   const expToNext = getExpForLevel(pet.level);
-  const evolutionName = pet.evolution === 1 ? '幼年期' : pet.evolution === 2 ? '成長期' : '成年期';
+  const evolutionName = pet.evolution === 1 ? '幼年期' : pet.evolution === 2 ? '成长期' : '成年期';
 
   return (
     <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
@@ -163,7 +163,7 @@ export default function PetPage() {
           <div className="flex items-center gap-4">
             <PixelBadge variant="exp">💰 {coins} コイン</PixelBadge>
             <Link href="/dashboard">
-              <PixelButton variant="ghost" size="sm">← ダッシュボード</PixelButton>
+              <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
             </Link>
           </div>
         </div>
@@ -171,9 +171,9 @@ export default function PetPage() {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">ペットルーム</h2>
+          <h2 className="text-lg text-[#2D2D2D] mb-2">宠物ルーム</h2>
           <p className="text-[10px] text-[#666666]">
-            {pet.name}と一緒に過ごそう！学習して_EXP_をあげよう！
+            {pet.name}と和你的宠物一起度过时光吧！学习获得经验值！
           </p>
         </div>
 
@@ -185,7 +185,7 @@ export default function PetPage() {
               <div>
                 <h3 className="text-sm">{pet.name}</h3>
                 <p className="text-[10px] text-[#666666]">
-                  {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫' : '兎'}
+                  {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫咪' : '兔子'}
                   {' - '}
                   {evolutionName}
                 </p>
@@ -248,14 +248,14 @@ export default function PetPage() {
 
             {/* Accessories */}
             <div className="p-3 bg-white border-2 border-black">
-              <p className="text-[10px] mb-2">🎨 アクセサリー</p>
+              <p className="text-[10px] mb-2">🎨 装饰品</p>
               <div className="flex gap-2">
                 {pet.accessories.length > 0 ? (
                   pet.accessories.map((acc, i) => (
                     <PixelBadge key={i} variant="default">{acc}</PixelBadge>
                   ))
                 ) : (
-                  <span className="text-[10px] text-[#666666]">まだアクセサリーがありません（还没有饰品）</span>
+                  <span className="text-[10px] text-[#666666]">まだ装饰品がありません（还没有饰品）</span>
                 )}
               </div>
             </div>
@@ -265,66 +265,66 @@ export default function PetPage() {
           <div className="flex flex-col gap-6">
             {/* Action Buttons */}
             <PixelCard>
-              <h3 className="text-xs mb-4">アクション</h3>
+              <h3 className="text-xs mb-4">操作</h3>
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="accent"
                   onClick={handleFeed}
                   disabled={state !== 'idle'}
                 >
-                  🍖 餌やり (10コイン)
+                  🍖 喂食 (10コイン)
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
                   onClick={handlePet}
                   disabled={state !== 'idle'}
                 >
-                  🤗 なでる
+                  🤗 摸摸
                 </PixelButton>
                 <PixelButton
                   variant="primary"
                   onClick={handleStudy}
                   disabled={state !== 'idle'}
                 >
-                  📚 一緒に勉強
+                  📚 一起学习
                 </PixelButton>
                 <PixelButton
                   variant="ghost"
                   onClick={handleSleep}
                   disabled={state !== 'idle'}
                 >
-                  💤 おやすみ
+                  💤 睡觉
                 </PixelButton>
               </div>
             </PixelCard>
 
             {/* Pet Info */}
             <PixelCard>
-              <h3 className="text-xs mb-4">ペット情報</h3>
+              <h3 className="text-xs mb-4">宠物情報</h3>
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                  <span className="text-[10px]">名前</span>
+                  <span className="text-[10px]">名字</span>
                   <span className="text-xs">{pet.name}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                  <span className="text-[10px]">種類</span>
+                  <span className="text-[10px]">种类</span>
                   <span className="text-xs">
-                    {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫' : '兎'}
+                    {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫咪' : '兔子'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                  <span className="text-[10px]">レベル</span>
+                  <span className="text-[10px]">等级</span>
                   <span className="text-xs">{pet.level}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                  <span className="text-[10px]">進化段階</span>
+                  <span className="text-[10px]">进化阶段</span>
                   <span className="text-xs">{evolutionName}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                  <span className="text-[10px]">次の進化まで</span>
+                  <span className="text-[10px]">距离下次进化</span>
                   <span className="text-xs">
-                    {pet.evolution === 1 ? `Lv.${11 - pet.level} remaining` :
-                     pet.evolution === 2 ? `Lv.${26 - pet.level} remaining` :
+                    {pet.evolution === 1 ? `Lv.${11 - pet.level} 级` :
+                     pet.evolution === 2 ? `Lv.${26 - pet.level} 级` :
                      'MAX'}
                   </span>
                 </div>
@@ -333,7 +333,7 @@ export default function PetPage() {
 
             {/* Evolution Guide */}
             <PixelCard>
-              <h3 className="text-xs mb-4">進化ガイド</h3>
+              <h3 className="text-xs mb-4">进化指南</h3>
               <div className="flex flex-col gap-3">
                 <div className={`p-3 border-2 border-black ${pet.evolution >= 1 ? 'bg-[#4ADE80]' : 'bg-white'}`}>
                   <div className="flex justify-between items-center">
@@ -343,7 +343,7 @@ export default function PetPage() {
                 </div>
                 <div className={`p-3 border-2 border-black ${pet.evolution >= 2 ? 'bg-[#4ADE80]' : 'bg-white'}`}>
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px]">Stage 2: 成長期</span>
+                    <span className="text-[10px]">Stage 2: 成长期</span>
                     <span className="text-[10px]">Lv.11-25</span>
                   </div>
                 </div>
@@ -361,12 +361,12 @@ export default function PetPage() {
         {/* Tips */}
         <div className="mt-8">
           <PixelDialog>
-            <p className="text-xs mb-2">💡 ペットを育てるコツ</p>
+            <p className="text-xs mb-2">💡 宠物を育てるコツ</p>
             <p className="text-[10px] text-[#666666]">
               • 毎日学習して経験値をあげよう！（每天学习获得经验值！）<br />
-              • 餌やりで満腹度をキープ！（喂食保持饱腹度！）<br />
-              • なでると幸福度が上がる！（摸摸提升幸福感！）<br />
-              • 一緒に勉強してレベルアップ！（一起学习升级！）
+              • 喂食で満腹度をキープ！（喂食保持饱腹度！）<br />
+              • 摸摸と幸福度が上がる！（摸摸提升幸福感！）<br />
+              • 一起学习して等级アップ！（一起学习升级！）
             </p>
           </PixelDialog>
         </div>
@@ -376,7 +376,7 @@ export default function PetPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

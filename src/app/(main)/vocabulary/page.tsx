@@ -78,16 +78,16 @@ export default function VocabularyPage() {
             </Link>
           </div>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← ダッシュボード</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
           </Link>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">単語帳</h2>
+          <h2 className="text-lg text-[#2D2D2D] mb-2">单词本</h2>
           <p className="text-[10px] text-[#666666]">
-            基本的な単語を効率よく覚えよう！カードをめくって学習！
+            高效记忆基础单词，翻转卡片轻松学习！
           </p>
         </div>
 
@@ -95,18 +95,18 @@ export default function VocabularyPage() {
         <PixelCard className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-xs mb-2">学習進捗</h3>
+              <h3 className="text-xs mb-2">学习进度</h3>
               <PixelProgress
                 value={masteredCount}
                 max={vocabularyData.length}
-                label={`${masteredCount}/${vocabularyData.length} マスター`}
+                label={`${masteredCount}/${vocabularyData.length} 已掌握`}
                 variant="exp"
                 showLabel
               />
             </div>
             <div className="flex gap-4">
-              <PixelBadge variant="exp">マスター: {masteredCount}</PixelBadge>
-              <PixelBadge variant="default">未学習: {vocabularyData.length - masteredCount}</PixelBadge>
+              <PixelBadge variant="exp">已掌握: {masteredCount}</PixelBadge>
+              <PixelBadge variant="default">未学习: {vocabularyData.length - masteredCount}</PixelBadge>
             </div>
           </div>
         </PixelCard>
@@ -118,7 +118,7 @@ export default function VocabularyPage() {
             size="sm"
             onClick={() => setSelectedCategory(null)}
           >
-            すべて
+            全部
           </PixelButton>
           {categories.map(cat => (
             <PixelButton
@@ -191,7 +191,7 @@ export default function VocabularyPage() {
                         <div className="text-sm">{selectedWord.hiragana}</div>
                         <div className="text-xs text-[#666666]">{selectedWord.romaji}</div>
                         <div className="absolute bottom-2 right-2 text-[10px] text-[#999999]">
-                          クリックしてめくる
+                          点击翻转
                         </div>
                       </>
                     ) : (
@@ -199,7 +199,7 @@ export default function VocabularyPage() {
                         <div className="text-2xl mb-2">{selectedWord.meaning}</div>
                         <div className="text-xs">{selectedWord.kanji}</div>
                         <div className="absolute bottom-2 right-2 text-[10px]">
-                          クリックして戻る
+                          点击返回
                         </div>
                       </>
                     )}
@@ -213,41 +213,41 @@ export default function VocabularyPage() {
                     className="flex-1"
                     onClick={handleDontKnow}
                   >
-                    ❓ わからない
+                    ❓ 不认识
                   </PixelButton>
                   <PixelButton
                     variant="accent"
                     className="flex-1"
                     onClick={handleKnow}
                   >
-                    ✅ わかる
+                    ✅ 认识
                   </PixelButton>
                 </div>
 
                 {/* Word Details */}
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">漢字</span>
+                    <span className="text-[10px]">汉字</span>
                     <span className="text-xs">{selectedWord.kanji}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">ひらがな</span>
+                    <span className="text-[10px]">平假名</span>
                     <span className="text-xs">{selectedWord.hiragana}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">ローマ字</span>
+                    <span className="text-[10px]">罗马音</span>
                     <span className="text-xs">{selectedWord.romaji}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">意味</span>
+                    <span className="text-[10px]">意思</span>
                     <span className="text-xs">{selectedWord.meaning}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">カテゴリー</span>
+                    <span className="text-[10px]">分类</span>
                     <span className="text-xs">{selectedWord.category}</span>
                   </div>
                   <div className="p-3 bg-[#FFD700] border-2 border-black">
-                    <p className="text-[10px] mb-1">📝 例文</p>
+                    <p className="text-[10px] mb-1">📝 例句</p>
                     <p className="text-xs">{selectedWord.example}</p>
                     <p className="text-[10px] text-[#666666] mt-1">{selectedWord.exampleMeaning}</p>
                   </div>
@@ -256,7 +256,7 @@ export default function VocabularyPage() {
             ) : (
               <PixelCard>
                 <PixelDialog>
-                  <p>単語を選んでください</p>
+                  <p>请选择一个单词</p>
                   <p className="text-[#666666] text-[10px] mt-2">
                     （请选择一个单词）
                   </p>
@@ -271,7 +271,7 @@ export default function VocabularyPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 毎日少しずつ、上手になれる！
+            © 2024 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

@@ -25,19 +25,19 @@ export default function LoginPage() {
             <span className="text-white text-2xl">あ</span>
           </div>
           <h1 className="text-lg text-[#2D2D2D]">kanaAI</h1>
-          <p className="text-[10px] text-[#666666] mt-2">ログインして学習を続けよう！</p>
+          <p className="text-[10px] text-[#666666] mt-2">登录后继续学习</p>
         </div>
 
         {/* Login Form */}
         <PixelCard variant="elevated">
           <PixelDialog className="mb-6">
-            <p>おかえりなさい！</p>
-            <p className="text-[#666666] text-[10px] mt-1">（欢迎回来！）</p>
+            <p>欢迎回来！</p>
+            <p className="text-[#666666] text-[10px] mt-1">继续你的日语学习之旅吧</p>
           </PixelDialog>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <PixelInput
-              label="メールアドレス"
+              label="邮箱"
               type="email"
               placeholder="example@email.com"
               value={email}
@@ -46,7 +46,7 @@ export default function LoginPage() {
             />
 
             <PixelInput
-              label="パスワード"
+              label="密码"
               type="password"
               placeholder="••••••••"
               value={password}
@@ -57,10 +57,10 @@ export default function LoginPage() {
             <div className="flex items-center justify-between text-[10px]">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="w-4 h-4 border-2 border-black" />
-                <span>ログイン状態を保持</span>
+                <span>记住登录状态</span>
               </label>
               <a href="#" className="text-[#3B82F6] hover:underline">
-                パスワードを忘れた？
+                忘记密码？
               </a>
             </div>
 
@@ -69,15 +69,15 @@ export default function LoginPage() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? '読み込み中...' : 'ログイン'}
+              {isLoading ? '登录中...' : '登录'}
             </PixelButton>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-[10px] text-[#666666]">
-              アカウントをお持ちでないですか？{' '}
+              还没有账号？{' '}
               <Link href="/register" className="text-[#3B82F6] hover:underline">
-                新規登録
+                免费注册
               </Link>
             </p>
           </div>
@@ -86,7 +86,7 @@ export default function LoginPage() {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/" className="text-[10px] text-[#666666] hover:text-[#2D2D2D]">
-            ← ホームに戻る
+            ← 返回首页
           </Link>
         </div>
       </div>
