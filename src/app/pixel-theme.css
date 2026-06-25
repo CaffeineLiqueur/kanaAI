@@ -1,0 +1,255 @@
+/* JPLearning - Pokemon Pixel Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  /* Pokemon-inspired color palette */
+  --color-primary: #FF1C1C;
+  --color-primary-dark: #CC0000;
+  --color-primary-light: #FF6666;
+  --color-secondary: #3B82F6;
+  --color-secondary-dark: #2563EB;
+  --color-secondary-light: #60A5FA;
+  --color-accent: #FFD700;
+  --color-accent-dark: #FFA500;
+  --color-bg: #F5F0E1;
+  --color-bg-dark: #E8E0CC;
+  --color-text: #2D2D2D;
+  --color-text-light: #666666;
+  --color-success: #4ADE80;
+  --color-error: #EF4444;
+
+  /* Pixel font */
+  --font-pixel: 'Press Start 2P', cursive;
+
+  /* Pixel border width */
+  --border-pixel: 4px;
+}
+
+/* Base pixel styles */
+* {
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-pixel);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Pixel Button */
+.pixel-button {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  background: var(--color-primary);
+  color: white;
+  border: var(--border-pixel) solid #000;
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-primary-dark),
+    inset 4px 4px 0 0 var(--color-primary-light),
+    8px 8px 0 0 rgba(0,0,0,0.3);
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  text-transform: uppercase;
+}
+
+.pixel-button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-primary-dark),
+    inset 4px 4px 0 0 var(--color-primary-light),
+    10px 10px 0 0 rgba(0,0,0,0.3);
+}
+
+.pixel-button:active {
+  transform: translate(4px, 4px);
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-primary-dark),
+    inset 4px 4px 0 0 var(--color-primary-light),
+    4px 4px 0 0 rgba(0,0,0,0.3);
+}
+
+.pixel-button--secondary {
+  background: var(--color-secondary);
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-secondary-dark),
+    inset 4px 4px 0 0 var(--color-secondary-light),
+    8px 8px 0 0 rgba(0,0,0,0.3);
+}
+
+.pixel-button--secondary:hover {
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-secondary-dark),
+    inset 4px 4px 0 0 var(--color-secondary-light),
+    10px 10px 0 0 rgba(0,0,0,0.3);
+}
+
+.pixel-button--accent {
+  background: var(--color-accent);
+  color: var(--color-text);
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-accent-dark),
+    inset 4px 4px 0 0 #FFE44D,
+    8px 8px 0 0 rgba(0,0,0,0.3);
+}
+
+/* Pixel Card */
+.pixel-card {
+  background: var(--color-bg);
+  border: var(--border-pixel) solid #000;
+  box-shadow: 8px 8px 0 0 rgba(0,0,0,0.2);
+  padding: 16px;
+}
+
+.pixel-card--elevated {
+  box-shadow: 12px 12px 0 0 rgba(0,0,0,0.25);
+}
+
+/* Pixel Input */
+.pixel-input {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  background: white;
+  border: var(--border-pixel) solid #000;
+  box-shadow:
+    inset 4px 4px 0 0 rgba(0,0,0,0.1);
+  padding: 12px 16px;
+  outline: none;
+}
+
+.pixel-input:focus {
+  box-shadow:
+    inset 4px 4px 0 0 rgba(0,0,0,0.1),
+    0 0 0 4px var(--color-secondary);
+}
+
+/* Pixel Progress Bar */
+.pixel-progress {
+  height: 24px;
+  background: #2D2D2D;
+  border: 3px solid #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark));
+  transition: width 0.3s ease;
+}
+
+.pixel-progress-fill--exp {
+  background: linear-gradient(90deg, #4ADE80, #22C55E);
+}
+
+.pixel-progress-fill--hp {
+  background: linear-gradient(90deg, #EF4444, #DC2626);
+}
+
+/* Pixel Badge */
+.pixel-badge {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 0 rgba(0,0,0,0.2);
+}
+
+.pixel-badge--exp {
+  background: var(--color-accent);
+  color: var(--color-text);
+}
+
+.pixel-badge--level {
+  background: var(--color-secondary);
+  color: white;
+}
+
+/* Pixel Dialog Box (Pokemon-style text box) */
+.pixel-dialog {
+  background: white;
+  border: var(--border-pixel) solid #000;
+  box-shadow:
+    inset -4px -4px 0 0 #CCCCCC,
+    inset 4px 4px 0 0 #FFFFFF,
+    8px 8px 0 0 rgba(0,0,0,0.3);
+  padding: 16px;
+  position: relative;
+}
+
+.pixel-dialog::after {
+  content: '▼';
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  animation: bounce 1s infinite;
+  font-size: 12px;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Pixel Sprite Animation */
+.pixel-sprite {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Pixel Grid Background */
+.pixel-grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Selection colors */
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-dark);
+  border: 2px solid #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border: 2px solid #000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}

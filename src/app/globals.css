@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-pixel: 'Press Start 2P', cursive;
+  --color-primary: #FF1C1C;
+  --color-primary-dark: #CC0000;
+  --color-primary-light: #FF6666;
+  --color-secondary: #3B82F6;
+  --color-secondary-dark: #2563EB;
+  --color-secondary-light: #60A5FA;
+  --color-accent: #FFD700;
+  --color-accent-dark: #FFA500;
+  --color-bg: #F5F0E1;
+  --color-bg-dark: #E8E0CC;
+  --color-text: #2D2D2D;
+  --color-text-light: #666666;
+  --color-success: #4ADE80;
+  --color-error: #EF4444;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}

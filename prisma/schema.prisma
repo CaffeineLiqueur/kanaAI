@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  createdAt     DateTime  @default(now())
+
+  pet           Pet?
+  progress      Progress[]
+  quizResults   QuizResult[]
+  vocabProgress VocabProgress[]
+}
+
+model Pet {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  species     String   // dog/cat/rabbit
+  level       Int      @default(1)
+  exp         Int      @default(0)
+  happiness   Int      @default(80)
+  hunger      Int      @default(20)
+  evolution   Int      @default(1)
+  accessories String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Progress {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  module    String    // kana/vocabulary/grammar
+  itemId    String    // 具体学习项ID
+  mastered  Boolean   @default(false)
+  reviewAt  DateTime? // 下次复习时间（艾宾浩斯）
+  createdAt DateTime  @default(now())
+
+  @@unique([userId, module, itemId])
+}
+
+model VocabProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  wordId       String
+  level        Int      @default(0) // 0-5 掌握程度
+  nextReview   DateTime
+  correctCount Int      @default(0)
+  wrongCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, wordId])
+}
+
+model QuizResult {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  score     Int
+  total     Int
+  details   Json     // 题目详情和答案
+  createdAt DateTime @default(now())
+}
