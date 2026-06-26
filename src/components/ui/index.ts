@@ -4,3 +4,5 @@ export { default as PixelInput } from './PixelInput';
 export { default as PixelProgress } from './PixelProgress';
 export { default as PixelBadge } from './PixelBadge';
 export { default as PixelDialog } from './PixelDialog';
+export { default as PlayButton } from './PlayButton';
+export { default as SpeakerSelector } from './SpeakerSelector';

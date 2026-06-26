@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
 
 // 词汇数据
 const vocabularyData = [
@@ -228,7 +228,10 @@ export default function VocabularyPage() {
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
                     <span className="text-[10px]">汉字</span>
-                    <span className="text-xs">{selectedWord.kanji}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">{selectedWord.kanji}</span>
+                      <PlayButton text={selectedWord.hiragana} size="sm" />
+                    </div>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
                     <span className="text-[10px]">平假名</span>
@@ -247,7 +250,10 @@ export default function VocabularyPage() {
                     <span className="text-xs">{selectedWord.category}</span>
                   </div>
                   <div className="p-3 bg-[#FFD700] border-2 border-black">
-                    <p className="text-[10px] mb-1">📝 例句</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[10px]">📝 例句</p>
+                      <PlayButton text={selectedWord.example} size="sm" />
+                    </div>
                     <p className="text-xs">{selectedWord.example}</p>
                     <p className="text-[10px] text-[#666666] mt-1">{selectedWord.exampleMeaning}</p>
                   </div>

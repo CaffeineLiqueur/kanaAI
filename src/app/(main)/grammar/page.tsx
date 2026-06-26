@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
 
 // 语法数据
 const grammarData = [
@@ -218,8 +218,11 @@ export default function GrammarPage() {
                   <h4 className="text-xs mb-3">📝 例句</h4>
                   <div className="p-4 bg-white border-3 border-black">
                     <div className="text-center mb-4">
-                      <div className="text-lg mb-2">
-                        {selectedGrammar.examples[currentExample].jp}
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <span className="text-lg">
+                          {selectedGrammar.examples[currentExample].jp}
+                        </span>
+                        <PlayButton text={selectedGrammar.examples[currentExample].jp} size="sm" />
                       </div>
                       <div className="text-xs text-[#666666] mb-1">
                         {selectedGrammar.examples[currentExample].romaji}

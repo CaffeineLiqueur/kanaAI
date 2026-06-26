@@ -1,8 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelDialog, PixelBadge } from '@/components/ui';
+import { PixelButton, PixelCard, PixelDialog, PixelBadge, PlayButton, SpeakerSelector } from '@/components/ui';
+import { useTTS } from '@/lib/tts/useTTS';
+import { useTTSSettings } from '@/lib/tts/TTSContext';
+
+// Extract Japanese text from mixed JP/CN response
+function extractJapaneseText(text: string): string {
+  const lines = text.split('\n');
+  const japaneseLines = lines.filter(line => {
+    // Match lines containing hiragana, katakana, or common kanji
+    return /[぀-ゟ゠-ヿ一-龯]/.test(line) &&
+      // Exclude lines that are purely Chinese explanations (parenthesized)
+      !/^[（(].*[）)]$/.test(line.trim());
+  });
+  // Remove parenthesized Chinese translations
+  return japaneseLines
+    .map(line => line.replace(/[（(][^）)]*[）)]/g, '').trim())
+    .filter(line => line.length > 0)
+    .join('。');
+}
 
 // 对话场景
 const scenes = [
@@ -72,6 +90,24 @@ export default function PracticePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { play, isPlaying } = useTTS();
+  const ttsSettings = useTTSSettings();
+  const prevMessageCountRef = useRef(0);
+
+  // Auto-play when new assistant message arrives
+  useEffect(() => {
+    if (!ttsSettings.autoPlay || !ttsSettings.enabled) return;
+    if (messages.length <= prevMessageCountRef.current) return;
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage.role === 'assistant') {
+      const japaneseText = extractJapaneseText(lastMessage.content);
+      if (japaneseText) {
+        play(japaneseText, ttsSettings.speaker);
+      }
+    }
+    prevMessageCountRef.current = messages.length;
+  }, [messages, ttsSettings.autoPlay, ttsSettings.enabled, ttsSettings.speaker, play]);
 
   const handleSceneSelect = (scene: typeof scenes[0]) => {
     setSelectedScene(scene);
@@ -140,9 +176,12 @@ export default function PracticePage() {
               <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
             </Link>
           </div>
-          <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
-          </Link>
+          <div className="flex items-center gap-2 relative">
+            <Link href="/dashboard">
+              <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
+            </Link>
+            <SpeakerSelector />
+          </div>
         </div>
       </header>
 
@@ -217,14 +256,22 @@ export default function PracticePage() {
                       key={index}
                       className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}
                     >
-                      <div
-                        className={`inline-block max-w-[80%] p-3 border-2 border-black ${
-                          msg.role === 'user'
-                            ? 'bg-[#3B82F6] text-white'
-                            : 'bg-[#F5F0E1]'
-                        }`}
-                      >
-                        <div className="text-xs whitespace-pre-wrap">{msg.content}</div>
+                      <div className="flex items-end gap-2">
+                        {msg.role === 'assistant' && (
+                          <PlayButton
+                            text={extractJapaneseText(msg.content) || msg.content}
+                            size="sm"
+                          />
+                        )}
+                        <div
+                          className={`inline-block max-w-[80%] p-3 border-2 border-black ${
+                            msg.role === 'user'
+                              ? 'bg-[#3B82F6] text-white'
+                              : 'bg-[#F5F0E1]'
+                          }`}
+                        >
+                          <div className="text-xs whitespace-pre-wrap">{msg.content}</div>
+                        </div>
                       </div>
                     </div>
                   ))}

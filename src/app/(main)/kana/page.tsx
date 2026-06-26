@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
 
 // 平假名数据
 const hiraganaData = [
@@ -208,8 +208,11 @@ export default function KanaPage() {
             {selectedKana ? (
               <PixelCard variant="elevated">
                 <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-white border-4 border-black mx-auto mb-4 flex items-center justify-center">
+                  <div className="w-24 h-24 bg-white border-4 border-black mx-auto mb-4 flex items-center justify-center relative">
                     <span className="text-5xl">{selectedKana.char}</span>
+                    <div className="absolute -bottom-1 -right-1">
+                      <PlayButton text={selectedKana.char} size="sm" />
+                    </div>
                   </div>
                   <h3 className="text-sm mb-1">{selectedKana.char}</h3>
                   <p className="text-[10px] text-[#666666]">{selectedKana.romaji}</p>
