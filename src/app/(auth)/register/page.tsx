@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PixelButton, PixelCard, PixelInput, PixelDialog } from '@/components/ui';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +22,18 @@ export default function RegisterPage() {
     setIsLoading(true);
     // TODO: 实现注册逻辑
     setTimeout(() => setIsLoading(false), 1000);
+  };
+
+  // 开发模式：跳过注册
+  const handleDevBypass = () => {
+    const devUser = {
+      id: 'dev-user-001',
+      name: '开发者',
+      email: 'dev@kanaai.local',
+      isDev: true,
+    };
+    localStorage.setItem('kanaai_user', JSON.stringify(devUser));
+    router.push('/dashboard');
   };
 
   return (
@@ -98,6 +112,20 @@ export default function RegisterPage() {
               {isLoading ? '注册中...' : '免费注册'}
             </PixelButton>
           </form>
+
+          {/* 开发模式跳过注册 */}
+          <div className="mt-4 pt-4 border-t-2 border-dashed border-[#CCCCCC]">
+            <PixelButton
+              variant="ghost"
+              className="w-full"
+              onClick={handleDevBypass}
+            >
+              🚀 开发模式 - 跳过注册
+            </PixelButton>
+            <p className="text-[10px] text-[#999999] text-center mt-2">
+              仅用于开发测试
+            </p>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-[10px] text-[#666666]">

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
 
@@ -28,6 +30,27 @@ const dailyGoals = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<{ name: string; isDev?: boolean } | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('kanaai_user');
+    if (stored) {
+      setUser(JSON.parse(stored));
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('kanaai_user');
+    router.push('/');
+  };
+
+  if (!user) {
+    return null; // 加载中
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
       {/* Header */}
@@ -38,12 +61,21 @@ export default function DashboardPage() {
               <span className="text-white text-lg">あ</span>
             </div>
             <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
+            {user.isDev && (
+              <PixelBadge variant="error" size="sm">DEV</PixelBadge>
+            )}
           </div>
           <div className="flex items-center gap-4">
             <PixelBadge variant="level">Lv.{mockUser.level}</PixelBadge>
             <PixelBadge variant="exp">🔥 连续{mockUser.streak}天</PixelBadge>
-            <div className="w-10 h-10 bg-[#FFD700] border-3 border-black rounded-full flex items-center justify-center">
-              <span className="text-sm">👤</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px]">{user.name}</span>
+              <button
+                onClick={handleLogout}
+                className="w-10 h-10 bg-[#FFD700] border-3 border-black rounded-full flex items-center justify-center hover:bg-[#FFC800]"
+              >
+                <span className="text-sm">👤</span>
+              </button>
             </div>
           </div>
         </div>
@@ -53,7 +85,7 @@ export default function DashboardPage() {
         {/* Welcome Message */}
         <div className="mb-8">
           <PixelDialog>
-            <p>欢迎回来，{mockUser.name}！</p>
+            <p>欢迎回来，{user.name}！</p>
             <p className="text-[#666666] text-[10px] mt-2">
               今天也来学习日语吧，你的宠物在等你哦！
             </p>
