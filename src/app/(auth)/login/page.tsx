@@ -10,24 +10,67 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    // TODO: 实现登录逻辑
-    setTimeout(() => setIsLoading(false), 1000);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || '登录失败');
+        return;
+      }
+
+      router.push('/dashboard');
+    } catch {
+      setError('网络错误，请稍后重试');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 开发模式：跳过登录
-  const handleDevBypass = () => {
-    const devUser = {
-      id: 'dev-user-001',
-      name: '开发者',
-      email: 'dev@kanaai.local',
-      isDev: true,
-    };
-    localStorage.setItem('kanaai_user', JSON.stringify(devUser));
-    router.push('/dashboard');
+  const handleDevBypass = async () => {
+    try {
+      // 尝试用测试账号登录
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'dev@kanaai.local', password: 'dev12345678' }),
+      });
+
+      if (response.ok) {
+        router.push('/dashboard');
+        return;
+      }
+
+      // 如果测试账号不存在，注册一个
+      const regResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: '开发者',
+          email: 'dev@kanaai.local',
+          password: 'dev12345678',
+        }),
+      });
+
+      if (regResponse.ok) {
+        router.push('/dashboard');
+      }
+    } catch {
+      setError('开发模式登录失败');
+    }
   };
 
   return (
@@ -48,6 +91,12 @@ export default function LoginPage() {
             <p>欢迎回来！</p>
             <p className="text-[#666666] text-[10px] mt-1">继续你的日语学习之旅吧</p>
           </PixelDialog>
+
+          {error && (
+            <div className="mb-4 p-3 bg-[#EF4444] text-white border-2 border-black text-[10px]">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <PixelInput

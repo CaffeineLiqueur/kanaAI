@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
 
@@ -82,6 +82,45 @@ export default function GrammarPage() {
   const [selectedGrammar, setSelectedGrammar] = useState<typeof grammarData[0] | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [currentExample, setCurrentExample] = useState(0);
+  const [masteredItems, setMasteredItems] = useState<Set<string>>(new Set());
+
+  // Load grammar progress
+  useEffect(() => {
+    async function loadProgress() {
+      try {
+        const res = await fetch('/api/progress?module=grammar');
+        if (res.ok) {
+          const data = await res.json();
+          const mastered = new Set<string>(
+            data.progress
+              .filter((p: { mastered: boolean }) => p.mastered)
+              .map((p: { itemId: string }) => p.itemId)
+          );
+          setMasteredItems(mastered);
+        }
+      } catch {
+        // Use empty progress
+      }
+    }
+    loadProgress();
+  }, []);
+
+  const markAsMastered = async (grammarId: string) => {
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module: 'grammar',
+          itemId: grammarId,
+          mastered: true,
+        }),
+      });
+      setMasteredItems(prev => new Set([...prev, grammarId]));
+    } catch {
+      // Failed to save
+    }
+  };
 
   const handleGrammarClick = (grammar: typeof grammarData[0]) => {
     setSelectedGrammar(grammar);
@@ -134,9 +173,9 @@ export default function GrammarPage() {
             <div>
               <h3 className="text-xs mb-2">学习进度</h3>
               <PixelProgress
-                value={1}
+                value={masteredItems.size}
                 max={grammarData.length}
-                label="1/5 已掌握"
+                label={`${masteredItems.size}/${grammarData.length} 已掌握`}
                 variant="exp"
                 showLabel
               />
@@ -261,8 +300,21 @@ export default function GrammarPage() {
                   <p className="text-[10px] leading-relaxed">{selectedGrammar.tips}</p>
                 </div>
 
-                {/* Practice Button */}
-                <div className="mt-6">
+                {/* Action Buttons */}
+                <div className="mt-6 flex flex-col gap-3">
+                  {masteredItems.has(selectedGrammar.id) ? (
+                    <div className="p-3 bg-[#4ADE80] border-2 border-black text-center text-[10px]">
+                      ✅ 已掌握
+                    </div>
+                  ) : (
+                    <PixelButton
+                      className="w-full"
+                      variant="accent"
+                      onClick={() => markAsMastered(selectedGrammar.id)}
+                    >
+                      ✅ 标记为已掌握
+                    </PixelButton>
+                  )}
                   <Link href="/practice">
                     <PixelButton className="w-full">
                       💬 练习这个语法
@@ -288,7 +340,7 @@ export default function GrammarPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

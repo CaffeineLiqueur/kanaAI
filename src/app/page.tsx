@@ -221,7 +221,7 @@ export default function Home() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 让日语学习变得有趣！
+            © 2026 kanaAI - 让日语学习变得有趣！
           </p>
         </div>
       </footer>

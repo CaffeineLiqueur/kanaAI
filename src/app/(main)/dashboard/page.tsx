@@ -3,53 +3,100 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge } from '@/components/ui';
+import { getExpForLevel } from '@/lib/utils';
 
-// 模拟数据 - 实际应从API获取
-const mockUser = {
-  name: '学习者',
-  level: 5,
-  exp: 350,
-  expToNext: 500,
-  streak: 7,
-};
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
-const mockPet = {
-  name: '小柴',
-  species: 'dog',
-  level: 8,
-  happiness: 85,
-  hunger: 30,
-};
+interface Pet {
+  id: string;
+  name: string;
+  species: string;
+  level: number;
+  exp: number;
+  happiness: number;
+  hunger: number;
+  evolution: number;
+}
 
-const dailyGoals = [
-  { id: 1, name: '学习5个假名', completed: true, exp: 50 },
-  { id: 2, name: '复习10个单词', completed: true, exp: 50 },
-  { id: 3, name: '学习1个语法点', completed: false, exp: 30 },
-  { id: 4, name: 'AI对话练习', completed: false, exp: 40 },
-];
+interface ProgressItem {
+  id: string;
+  module: string;
+  itemId: string;
+  mastered: boolean;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; isDev?: boolean } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [pet, setPet] = useState<Pet | null>(null);
+  const [progress, setProgress] = useState<ProgressItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('kanaai_user');
-    if (stored) {
-      setUser(JSON.parse(stored));
-    } else {
-      router.push('/login');
+    async function loadData() {
+      try {
+        // Fetch user
+        const userRes = await fetch('/api/auth/me');
+        if (!userRes.ok) {
+          router.push('/login');
+          return;
+        }
+        const userData = await userRes.json();
+        setUser(userData.user);
+
+        // Fetch pet
+        const petRes = await fetch('/api/pet');
+        if (petRes.ok) {
+          const petData = await petRes.json();
+          setPet(petData.pet);
+        }
+
+        // Fetch progress
+        const progressRes = await fetch('/api/progress');
+        if (progressRes.ok) {
+          const progressData = await progressRes.json();
+          setProgress(progressData.progress);
+        }
+      } catch {
+        router.push('/login');
+      } finally {
+        setLoading(false);
+      }
     }
+
+    loadData();
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('kanaai_user');
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/');
   };
 
-  if (!user) {
-    return null; // 加载中
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-[#F5F0E1] pixel-grid flex items-center justify-center">
+        <div className="text-xs text-[#666666]">加载中...</div>
+      </div>
+    );
   }
+
+  // Calculate progress stats
+  const kanaProgress = progress.filter(p => p.module === 'kana');
+  const kanaMastered = kanaProgress.filter(p => p.mastered).length;
+  const vocabProgress = progress.filter(p => p.module === 'vocabulary');
+  const vocabMastered = vocabProgress.filter(p => p.mastered).length;
+  const grammarProgress = progress.filter(p => p.module === 'grammar');
+  const grammarMastered = grammarProgress.filter(p => p.mastered).length;
+
+  const totalMastered = kanaMastered + vocabMastered + grammarMastered;
+  const userLevel = Math.max(1, Math.floor(totalMastered / 10) + 1);
+  const userExp = (totalMastered % 10) * 50;
+  const expToNext = 500;
 
   return (
     <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
@@ -61,13 +108,9 @@ export default function DashboardPage() {
               <span className="text-white text-lg">あ</span>
             </div>
             <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
-            {user.isDev && (
-              <PixelBadge variant="error" size="sm">DEV</PixelBadge>
-            )}
           </div>
           <div className="flex items-center gap-4">
-            <PixelBadge variant="level">Lv.{mockUser.level}</PixelBadge>
-            <PixelBadge variant="exp">🔥 连续{mockUser.streak}天</PixelBadge>
+            <PixelBadge variant="level">Lv.{userLevel}</PixelBadge>
             <div className="flex items-center gap-2">
               <span className="text-[10px]">{user.name}</span>
               <button
@@ -84,12 +127,12 @@ export default function DashboardPage() {
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Welcome Message */}
         <div className="mb-8">
-          <PixelDialog>
-            <p>欢迎回来，{user.name}！</p>
+          <PixelCard>
+            <p className="text-xs">欢迎回来，{user.name}！</p>
             <p className="text-[#666666] text-[10px] mt-2">
               今天也来学习日语吧，你的宠物在等你哦！
             </p>
-          </PixelDialog>
+          </PixelCard>
         </div>
 
         {/* User Stats & Pet Section */}
@@ -101,100 +144,79 @@ export default function DashboardPage() {
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-[10px]">等级</span>
-                  <span className="text-[10px]">{mockUser.level}</span>
+                  <span className="text-[10px]">{userLevel}</span>
                 </div>
                 <PixelProgress
-                  value={mockUser.exp}
-                  max={mockUser.expToNext}
+                  value={userExp}
+                  max={expToNext}
                   variant="exp"
                 />
                 <div className="text-[10px] text-right mt-1 text-[#666666]">
-                  {mockUser.exp}/{mockUser.expToNext} EXP
+                  {userExp}/{expToNext} EXP
                 </div>
               </div>
               <div className="flex justify-between items-center p-3 bg-[#FFD700] border-2 border-black">
-                <span className="text-[10px]">连续学习</span>
-                <span className="text-xs font-bold">{mockUser.streak}天 🔥</span>
+                <span className="text-[10px]">已掌握</span>
+                <span className="text-xs font-bold">{totalMastered} 项</span>
               </div>
             </div>
           </PixelCard>
 
           {/* Pet Card */}
           <PixelCard className="lg:col-span-2">
-            <div className="flex items-center gap-6">
-              {/* Pet Sprite */}
-              <div className="w-32 h-32 bg-[#FFD700] border-4 border-black flex items-center justify-center shrink-0">
-                <span className="text-6xl">
-                  {mockPet.species === 'dog' ? '🐕' : mockPet.species === 'cat' ? '🐱' : '🐰'}
-                </span>
+            {pet ? (
+              <div className="flex items-center gap-6">
+                {/* Pet Sprite */}
+                <div className="w-32 h-32 bg-[#FFD700] border-4 border-black flex items-center justify-center shrink-0">
+                  <span className="text-6xl">
+                    {pet.species === 'dog' ? '🐕' : pet.species === 'cat' ? '🐱' : '🐰'}
+                  </span>
+                </div>
+
+                {/* Pet Info */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-sm">{pet.name}</h3>
+                    <PixelBadge variant="level">Lv.{pet.level}</PixelBadge>
+                  </div>
+
+                  <div className="flex flex-col gap-2 mb-4">
+                    <PixelProgress
+                      value={pet.exp}
+                      max={getExpForLevel(pet.level)}
+                      label="经验"
+                      variant="exp"
+                      showLabel
+                    />
+                    <PixelProgress
+                      value={pet.happiness}
+                      label="心情"
+                      variant="default"
+                      showLabel
+                    />
+                    <PixelProgress
+                      value={100 - pet.hunger}
+                      label="饱腹"
+                      showLabel
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Link href="/pet">
+                      <PixelButton size="sm" variant="accent">
+                        查看宠物
+                      </PixelButton>
+                    </Link>
+                  </div>
+                </div>
               </div>
-
-              {/* Pet Info */}
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <h3 className="text-sm">{mockPet.name}</h3>
-                  <PixelBadge variant="level">Lv.{mockPet.level}</PixelBadge>
-                </div>
-
-                <div className="flex flex-col gap-2 mb-4">
-                  <PixelProgress
-                    value={mockPet.happiness}
-                    label="心情"
-                    variant="exp"
-                    showLabel
-                  />
-                  <PixelProgress
-                    value={100 - mockPet.hunger}
-                    label="饱腹"
-                    showLabel
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <PixelButton size="sm" variant="accent">
-                    🍖 喂食
-                  </PixelButton>
-                  <PixelButton size="sm" variant="secondary">
-                    🤗 摸摸
-                  </PixelButton>
-                  <Link href="/pet">
-                    <PixelButton size="sm">
-                      查看宠物
-                    </PixelButton>
-                  </Link>
-                </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-[10px] text-[#666666]">加载宠物信息中...</p>
               </div>
-            </div>
+            )}
           </PixelCard>
         </div>
-
-        {/* Daily Goals */}
-        <PixelCard className="mb-8">
-          <h2 className="text-xs mb-4">今日目标</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {dailyGoals.map((goal) => (
-              <div
-                key={goal.id}
-                className={`flex items-center gap-3 p-3 border-2 border-black ${
-                  goal.completed ? 'bg-[#4ADE80]' : 'bg-white'
-                }`}
-              >
-                <div className={`w-6 h-6 border-2 border-black flex items-center justify-center ${
-                  goal.completed ? 'bg-white' : 'bg-transparent'
-                }`}>
-                  {goal.completed && <span>✓</span>}
-                </div>
-                <span className="text-[10px] flex-1">{goal.name}</span>
-                <PixelBadge variant="exp" size="sm">+{goal.exp} EXP</PixelBadge>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 text-center">
-            <span className="text-[10px] text-[#666666]">
-              已完成 {dailyGoals.filter(g => g.completed).length}/{dailyGoals.length}
-            </span>
-          </div>
-        </PixelCard>
 
         {/* Learning Modules Grid */}
         <h2 className="text-xs mb-4">学习模块</h2>
@@ -211,7 +233,12 @@ export default function DashboardPage() {
                   <p className="text-[10px] text-[#666666]">平假名 · 片假名</p>
                 </div>
               </div>
-              <PixelProgress value={45} label="进度" showLabel />
+              <PixelProgress
+                value={kanaMastered}
+                max={46}
+                label="进度"
+                showLabel
+              />
             </PixelCard>
           </Link>
 
@@ -227,7 +254,13 @@ export default function DashboardPage() {
                   <p className="text-[10px] text-[#666666]">基础词汇</p>
                 </div>
               </div>
-              <PixelProgress value={30} label="进度" variant="exp" showLabel />
+              <PixelProgress
+                value={vocabMastered}
+                max={11}
+                label="进度"
+                variant="exp"
+                showLabel
+              />
             </PixelCard>
           </Link>
 
@@ -243,7 +276,13 @@ export default function DashboardPage() {
                   <p className="text-[10px] text-[#666666]">基础语法</p>
                 </div>
               </div>
-              <PixelProgress value={15} label="进度" variant="default" showLabel />
+              <PixelProgress
+                value={grammarMastered}
+                max={5}
+                label="进度"
+                variant="default"
+                showLabel
+              />
             </PixelCard>
           </Link>
 
@@ -278,7 +317,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="text-[10px] text-[#666666]">
-                最高分: 85
+                测试你的日语水平
               </div>
             </PixelCard>
           </Link>
@@ -296,7 +335,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="text-[10px] text-[#666666]">
-                {mockPet.name} - Lv.{mockPet.level}
+                {pet ? `${pet.name} - Lv.${pet.level}` : '加载中...'}
               </div>
             </PixelCard>
           </Link>
@@ -307,7 +346,7 @@ export default function DashboardPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

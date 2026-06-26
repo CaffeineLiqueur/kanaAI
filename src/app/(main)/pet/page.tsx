@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
 import { getExpForLevel, getEvolutionStage } from '@/lib/utils';
 
-// 宠物类型
 type PetSpecies = 'dog' | 'cat' | 'rabbit';
 
 interface Pet {
+  id: string;
   name: string;
   species: PetSpecies;
   level: number;
@@ -19,26 +19,12 @@ interface Pet {
   accessories: string[];
 }
 
-// 初始宠物数据
-const initialPet: Pet = {
-  name: 'ハチ',
-  species: 'dog',
-  level: 8,
-  exp: 350,
-  happiness: 85,
-  hunger: 30,
-  evolution: 1,
-  accessories: [],
-};
-
-// 宠物表情
 const petEmojis: Record<PetSpecies, Record<number, string>> = {
   dog: { 1: '🐕', 2: '🦮', 3: '🐕‍🦺' },
   cat: { 1: '🐱', 2: '🐈', 3: '🐈‍⬛' },
   rabbit: { 1: '🐰', 2: '🐇', 3: '🐇' },
 };
 
-// 宠物状态
 const stateEmojis = {
   idle: '😊',
   happy: '😄',
@@ -48,79 +34,92 @@ const stateEmojis = {
 };
 
 export default function PetPage() {
-  const [pet, setPet] = useState<Pet>(initialPet);
+  const [pet, setPet] = useState<Pet | null>(null);
   const [state, setState] = useState<'idle' | 'happy' | 'eating' | 'sleeping' | 'studying'>('idle');
   const [showMessage, setShowMessage] = useState('');
-  const [coins, setCoins] = useState(150);
+  const [loading, setLoading] = useState(true);
 
-  // 更新进化阶段
+  // Load pet from API
   useEffect(() => {
+    async function loadPet() {
+      try {
+        const res = await fetch('/api/pet');
+        if (res.ok) {
+          const data = await res.json();
+          setPet(data.pet);
+        }
+      } catch {
+        // Failed to load
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPet();
+  }, []);
+
+  // Update evolution when level changes
+  useEffect(() => {
+    if (!pet) return;
     const newEvolution = getEvolutionStage(pet.level);
     if (newEvolution !== pet.evolution) {
-      setPet(prev => ({ ...prev, evolution: newEvolution as 1 | 2 | 3 }));
+      setPet(prev => prev ? ({ ...prev, evolution: newEvolution as 1 | 2 | 3 }) : prev);
       setShowMessage(`🎉 ${pet.name}进化了！阶段${newEvolution}！`);
       setTimeout(() => setShowMessage(''), 3000);
     }
-  }, [pet.level]);
+  }, [pet?.level]);
 
-  // 喂食
-  const handleFeed = () => {
-    if (coins < 10) {
-      setShowMessage('💰 金币不足！（金币不足！）');
-      setTimeout(() => setShowMessage(''), 2000);
-      return;
+  const updatePet = async (action: string, data?: Record<string, unknown>) => {
+    try {
+      const res = await fetch('/api/pet', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, ...data }),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        setPet(result.pet);
+        return result.pet;
+      }
+    } catch {
+      // Failed to update
     }
+    return null;
+  };
 
+  const handleFeed = async () => {
+    if (!pet) return;
     setState('eating');
-    setCoins(prev => prev - 10);
-    setPet(prev => ({
-      ...prev,
-      hunger: Math.max(0, prev.hunger - 20),
-      happiness: Math.min(100, prev.happiness + 10),
-    }));
-
-    setShowMessage('🍖 好吃！谢谢！（好吃！谢谢！）');
+    await updatePet('feed');
+    setShowMessage('🍖 好吃！谢谢！');
     setTimeout(() => {
       setState('idle');
       setShowMessage('');
     }, 2000);
   };
 
-  // 摸摸
-  const handlePet = () => {
+  const handlePet = async () => {
+    if (!pet) return;
     setState('happy');
-    setPet(prev => ({
-      ...prev,
-      happiness: Math.min(100, prev.happiness + 15),
-    }));
-
-    setShowMessage('❤️ 好痒！好开心！（好痒！好开心！）');
+    await updatePet('pet');
+    setShowMessage('❤️ 好痒！好开心！');
     setTimeout(() => {
       setState('idle');
       setShowMessage('');
     }, 2000);
   };
 
-  // 学习
-  const handleStudy = () => {
+  const handleStudy = async () => {
+    if (!pet) return;
     setState('studying');
-    const expGain = 20;
-    const newExp = pet.exp + expGain;
-    const expToNext = getExpForLevel(pet.level);
+    const updatedPet = await updatePet('study', { expGain: 20 });
 
-    if (newExp >= expToNext) {
-      setPet(prev => ({
-        ...prev,
-        level: prev.level + 1,
-        exp: newExp - expToNext,
-      }));
-      setShowMessage(`🎊 等级アップ！Lv.${pet.level + 1}！`);
-    } else {
-      setPet(prev => ({
-        ...prev,
-        exp: newExp,
-      }));
-      setShowMessage(`📚 +${expGain}  EXP！努力了！（努力了！）`);
+    if (updatedPet) {
+      if (updatedPet.level > pet.level) {
+        setShowMessage(`🎊 等级アップ！Lv.${updatedPet.level}！`);
+      } else {
+        setShowMessage('📚 +20 EXP！努力了！');
+      }
     }
 
     setTimeout(() => {
@@ -129,20 +128,37 @@ export default function PetPage() {
     }, 2000);
   };
 
-  // 睡觉
-  const handleSleep = () => {
+  const handleSleep = async () => {
+    if (!pet) return;
     setState('sleeping');
-    setPet(prev => ({
-      ...prev,
-      hunger: Math.min(100, prev.hunger + 10),
-    }));
-
-    setShowMessage('💤 睡觉...（晚安...）');
+    await updatePet('sleep');
+    setShowMessage('💤 晚安...');
     setTimeout(() => {
       setState('idle');
       setShowMessage('');
     }, 3000);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F5F0E1] pixel-grid flex items-center justify-center">
+        <div className="text-xs text-[#666666]">加载中...</div>
+      </div>
+    );
+  }
+
+  if (!pet) {
+    return (
+      <div className="min-h-screen bg-[#F5F0E1] pixel-grid flex items-center justify-center">
+        <PixelCard>
+          <p className="text-xs">宠物数据加载失败</p>
+          <Link href="/dashboard">
+            <PixelButton className="mt-4">返回仪表板</PixelButton>
+          </Link>
+        </PixelCard>
+      </div>
+    );
+  }
 
   const expToNext = getExpForLevel(pet.level);
   const evolutionName = pet.evolution === 1 ? '幼年期' : pet.evolution === 2 ? '成长期' : '成年期';
@@ -160,12 +176,9 @@ export default function PetPage() {
               <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <PixelBadge variant="exp">💰 {coins} コイン</PixelBadge>
-            <Link href="/dashboard">
-              <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
-            </Link>
-          </div>
+          <Link href="/dashboard">
+            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
+          </Link>
         </div>
       </header>
 
@@ -173,7 +186,7 @@ export default function PetPage() {
         <div className="mb-8">
           <h2 className="text-lg text-[#2D2D2D] mb-2">宠物ルーム</h2>
           <p className="text-[10px] text-[#666666]">
-            {pet.name}と和你的宠物一起度过时光吧！学习获得经验值！
+            {pet.name}和你的宠物一起度过时光吧！学习获得经验值！
           </p>
         </div>
 
@@ -229,7 +242,7 @@ export default function PetPage() {
               <PixelProgress
                 value={pet.exp}
                 max={expToNext}
-                label="経験値"
+                label="经验值"
                 variant="exp"
                 showLabel
               />
@@ -241,7 +254,7 @@ export default function PetPage() {
               />
               <PixelProgress
                 value={100 - pet.hunger}
-                label="満腹度"
+                label="饱腹度"
                 showLabel
               />
             </div>
@@ -255,7 +268,7 @@ export default function PetPage() {
                     <PixelBadge key={i} variant="default">{acc}</PixelBadge>
                   ))
                 ) : (
-                  <span className="text-[10px] text-[#666666]">まだ装饰品がありません（还没有饰品）</span>
+                  <span className="text-[10px] text-[#666666]">还没有装饰品</span>
                 )}
               </div>
             </div>
@@ -272,7 +285,7 @@ export default function PetPage() {
                   onClick={handleFeed}
                   disabled={state !== 'idle'}
                 >
-                  🍖 喂食 (10コイン)
+                  🍖 喂食
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
@@ -300,7 +313,7 @@ export default function PetPage() {
 
             {/* Pet Info */}
             <PixelCard>
-              <h3 className="text-xs mb-4">宠物情報</h3>
+              <h3 className="text-xs mb-4">宠物信息</h3>
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
                   <span className="text-[10px]">名字</span>
@@ -361,12 +374,12 @@ export default function PetPage() {
         {/* Tips */}
         <div className="mt-8">
           <PixelDialog>
-            <p className="text-xs mb-2">💡 宠物を育てるコツ</p>
+            <p className="text-xs mb-2">💡 养宠物小技巧</p>
             <p className="text-[10px] text-[#666666]">
-              • 毎日学習して経験値をあげよう！（每天学习获得经验值！）<br />
-              • 喂食で満腹度をキープ！（喂食保持饱腹度！）<br />
-              • 摸摸と幸福度が上がる！（摸摸提升幸福感！）<br />
-              • 一起学习して等级アップ！（一起学习升级！）
+              • 每天学习获得经验值！<br />
+              • 喂食保持饱腹度！<br />
+              • 摸摸提升幸福感！<br />
+              • 一起学习升级！
             </p>
           </PixelDialog>
         </div>
@@ -376,7 +389,7 @@ export default function PetPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

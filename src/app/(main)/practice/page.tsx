@@ -326,7 +326,7 @@ export default function PracticePage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

@@ -99,6 +99,35 @@ export default function QuizPage() {
 
   const scorePercentage = Math.round((score / sampleQuestions.length) * 100);
 
+  // Save quiz result when finished
+  const saveQuizResult = async () => {
+    try {
+      await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'kana-vocab',
+          score,
+          total: sampleQuestions.length,
+          details: {
+            questions: sampleQuestions.map((q, i) => ({
+              question: q.questionCn,
+              correct: q.correct,
+            })),
+            scorePercentage,
+          },
+        }),
+      });
+    } catch {
+      // Failed to save quiz result
+    }
+  };
+
+  // Save when quiz finishes
+  if (isFinished && score > 0) {
+    saveQuizResult();
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
       {/* Header */}
@@ -310,7 +339,7 @@ export default function QuizPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

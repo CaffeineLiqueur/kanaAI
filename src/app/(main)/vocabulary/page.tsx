@@ -1,41 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
 
 // 词汇数据
 const vocabularyData = [
-  // 数字
   { id: '1', kanji: '一', hiragana: 'いち', romaji: 'ichi', meaning: '一', category: '数字', example: '一つください', exampleMeaning: '请给我一个' },
   { id: '2', kanji: '二', hiragana: 'に', romaji: 'ni', meaning: '二', category: '数字', example: '二人で行きます', exampleMeaning: '两个人去' },
   { id: '3', kanji: '三', hiragana: 'さん', romaji: 'san', meaning: '三', category: '数字', example: '三時に会いましょう', exampleMeaning: '三点见面吧' },
-  // 问候
   { id: '4', kanji: 'こんにちは', hiragana: 'こんにちは', romaji: 'konnichiwa', meaning: '你好', category: '挨拶', example: 'こんにちは、元気ですか？', exampleMeaning: '你好，你好吗？' },
   { id: '5', kanji: 'ありがとう', hiragana: 'ありがとう', romaji: 'arigatou', meaning: '谢谢', category: '挨拶', example: 'ありがとうございます', exampleMeaning: '非常感谢' },
   { id: '6', kanji: 'すみません', hiragana: 'すみません', romaji: 'sumimasen', meaning: '对不起/打扰了', category: '挨拶', example: 'すみません、道を教えてください', exampleMeaning: '不好意思，请告诉我路' },
-  // 食物
   { id: '7', kanji: '水', hiragana: 'みず', romaji: 'mizu', meaning: '水', category: '食べ物', example: '水をください', exampleMeaning: '请给我水' },
   { id: '8', kanji: 'ご飯', hiragana: 'ごはん', romaji: 'gohan', meaning: '饭', category: '食べ物', example: 'ご飯を食べます', exampleMeaning: '吃饭' },
   { id: '9', kanji: '魚', hiragana: 'さかな', romaji: 'sakana', meaning: '鱼', category: '食べ物', example: '魚が好きです', exampleMeaning: '喜欢鱼' },
-  // 家庭
   { id: '10', kanji: 'お父さん', hiragana: 'おとうさん', romaji: 'otousan', meaning: '爸爸', category: '家族', example: 'お父さんは会社員です', exampleMeaning: '爸爸是公司职员' },
   { id: '11', kanji: 'お母さん', hiragana: 'おかあさん', romaji: 'okaasan', meaning: '妈妈', category: '家族', example: 'お母さんは先生です', exampleMeaning: '妈妈是老师' },
 ];
 
-// 模拟学习进度
-const mockProgress: Record<string, { level: number; nextReview: Date }> = {
-  '1': { level: 3, nextReview: new Date() },
-  '2': { level: 2, nextReview: new Date() },
-  '4': { level: 4, nextReview: new Date() },
-  '5': { level: 5, nextReview: new Date() },
-};
+interface VocabProgressItem {
+  wordId: string;
+  level: number;
+  correctCount: number;
+  wrongCount: number;
+}
 
 export default function VocabularyPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedWord, setSelectedWord] = useState<typeof vocabularyData[0] | null>(null);
   const [showMeaning, setShowMeaning] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [vocabProgress, setVocabProgress] = useState<Record<string, VocabProgressItem>>({});
 
   const categories = [...new Set(vocabularyData.map(w => w.category))];
 
@@ -43,7 +39,27 @@ export default function VocabularyPage() {
     ? vocabularyData.filter(w => w.category === selectedCategory)
     : vocabularyData;
 
-  const masteredCount = vocabularyData.filter(w => mockProgress[w.id]?.level >= 4).length;
+  // Load progress from API
+  useEffect(() => {
+    async function loadProgress() {
+      try {
+        const res = await fetch('/api/vocab-progress');
+        if (res.ok) {
+          const data = await res.json();
+          const progressMap: Record<string, VocabProgressItem> = {};
+          data.vocabProgress.forEach((p: VocabProgressItem) => {
+            progressMap[p.wordId] = p;
+          });
+          setVocabProgress(progressMap);
+        }
+      } catch {
+        // Use empty progress
+      }
+    }
+    loadProgress();
+  }, []);
+
+  const masteredCount = vocabularyData.filter(w => (vocabProgress[w.id]?.level ?? 0) >= 4).length;
 
   const handleWordClick = (word: typeof vocabularyData[0]) => {
     setSelectedWord(word);
@@ -55,13 +71,50 @@ export default function VocabularyPage() {
     setIsFlipped(!isFlipped);
   };
 
-  const handleKnow = () => {
-    // TODO: 更新进度
+  const handleKnow = async () => {
+    if (!selectedWord) return;
     setShowMeaning(true);
+
+    try {
+      const res = await fetch('/api/vocab-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wordId: selectedWord.id, correct: true }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setVocabProgress(prev => ({
+          ...prev,
+          [selectedWord.id]: data.vocabProgress,
+        }));
+      }
+    } catch {
+      // Failed to save
+    }
   };
 
-  const handleDontKnow = () => {
+  const handleDontKnow = async () => {
+    if (!selectedWord) return;
     setShowMeaning(true);
+
+    try {
+      const res = await fetch('/api/vocab-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wordId: selectedWord.id, correct: false }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setVocabProgress(prev => ({
+          ...prev,
+          [selectedWord.id]: data.vocabProgress,
+        }));
+      }
+    } catch {
+      // Failed to save
+    }
   };
 
   return (
@@ -137,8 +190,8 @@ export default function VocabularyPage() {
           <div className="lg:col-span-2">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {filteredWords.map((word) => {
-                const progress = mockProgress[word.id];
-                const isMastered = progress?.level >= 4;
+                const progress = vocabProgress[word.id];
+                const isMastered = (progress?.level ?? 0) >= 4;
 
                 return (
                   <button
@@ -277,7 +330,7 @@ export default function VocabularyPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>

@@ -12,28 +12,72 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
     if (password !== confirmPassword) {
-      alert('两次输入的密码不一致');
+      setError('两次输入的密码不一致');
       return;
     }
+
     setIsLoading(true);
-    // TODO: 实现注册逻辑
-    setTimeout(() => setIsLoading(false), 1000);
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || '注册失败');
+        return;
+      }
+
+      router.push('/dashboard');
+    } catch {
+      setError('网络错误，请稍后重试');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 开发模式：跳过注册
-  const handleDevBypass = () => {
-    const devUser = {
-      id: 'dev-user-001',
-      name: '开发者',
-      email: 'dev@kanaai.local',
-      isDev: true,
-    };
-    localStorage.setItem('kanaai_user', JSON.stringify(devUser));
-    router.push('/dashboard');
+  const handleDevBypass = async () => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: '开发者',
+          email: 'dev@kanaai.local',
+          password: 'dev12345678',
+        }),
+      });
+
+      if (response.ok) {
+        router.push('/dashboard');
+        return;
+      }
+
+      // 如果已注册，直接登录
+      const loginResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'dev@kanaai.local', password: 'dev12345678' }),
+      });
+
+      if (loginResponse.ok) {
+        router.push('/dashboard');
+      }
+    } catch {
+      setError('开发模式注册失败');
+    }
   };
 
   return (
@@ -54,6 +98,12 @@ export default function RegisterPage() {
             <p>你好！欢迎加入！</p>
             <p className="text-[#666666] text-[10px] mt-1">一起开始日语学习之旅吧</p>
           </PixelDialog>
+
+          {error && (
+            <div className="mb-4 p-3 bg-[#EF4444] text-white border-2 border-black text-[10px]">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <PixelInput

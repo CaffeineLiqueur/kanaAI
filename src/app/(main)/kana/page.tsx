@@ -1,36 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
 
 // 平假名数据
 const hiraganaData = [
-  // あ行
   { char: 'あ', romaji: 'a', group: 'あ行' },
   { char: 'い', romaji: 'i', group: 'あ行' },
   { char: 'う', romaji: 'u', group: 'あ行' },
   { char: 'え', romaji: 'e', group: 'あ行' },
   { char: 'お', romaji: 'o', group: 'あ行' },
-  // か行
   { char: 'か', romaji: 'ka', group: 'か行' },
   { char: 'き', romaji: 'ki', group: 'か行' },
   { char: 'く', romaji: 'ku', group: 'か行' },
   { char: 'け', romaji: 'ke', group: 'か行' },
   { char: 'こ', romaji: 'ko', group: 'か行' },
-  // さ行
   { char: 'さ', romaji: 'sa', group: 'さ行' },
   { char: 'し', romaji: 'shi', group: 'さ行' },
   { char: 'す', romaji: 'su', group: 'さ行' },
   { char: 'せ', romaji: 'se', group: 'さ行' },
   { char: 'そ', romaji: 'so', group: 'さ行' },
-  // た行
   { char: 'た', romaji: 'ta', group: 'た行' },
   { char: 'ち', romaji: 'chi', group: 'た行' },
   { char: 'つ', romaji: 'tsu', group: 'た行' },
   { char: 'て', romaji: 'te', group: 'た行' },
   { char: 'と', romaji: 'to', group: 'た行' },
-  // な行
   { char: 'な', romaji: 'na', group: 'な行' },
   { char: 'に', romaji: 'ni', group: 'な行' },
   { char: 'ぬ', romaji: 'nu', group: 'な行' },
@@ -40,19 +35,16 @@ const hiraganaData = [
 
 // 片假名数据
 const katakanaData = [
-  // ア行
   { char: 'ア', romaji: 'a', group: 'ア行' },
   { char: 'イ', romaji: 'i', group: 'ア行' },
   { char: 'ウ', romaji: 'u', group: 'ア行' },
   { char: 'エ', romaji: 'e', group: 'ア行' },
   { char: 'オ', romaji: 'o', group: 'ア行' },
-  // カ行
   { char: 'カ', romaji: 'ka', group: 'カ行' },
   { char: 'キ', romaji: 'ki', group: 'カ行' },
   { char: 'ク', romaji: 'ku', group: 'カ行' },
   { char: 'ケ', romaji: 'ke', group: 'カ行' },
   { char: 'コ', romaji: 'ko', group: 'カ行' },
-  // サ行
   { char: 'サ', romaji: 'sa', group: 'サ行' },
   { char: 'シ', romaji: 'shi', group: 'サ行' },
   { char: 'ス', romaji: 'su', group: 'サ行' },
@@ -60,23 +52,38 @@ const katakanaData = [
   { char: 'ソ', romaji: 'so', group: 'サ行' },
 ];
 
-// 模拟学习进度
-const mockProgress: Record<string, boolean> = {
-  'あ': true, 'い': true, 'う': true, 'え': false, 'お': false,
-  'か': true, 'き': false, 'く': false, 'け': false, 'こ': false,
-};
-
 export default function KanaPage() {
   const [activeTab, setActiveTab] = useState<'hiragana' | 'katakana'>('hiragana');
   const [selectedKana, setSelectedKana] = useState<typeof hiraganaData[0] | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizAnswer, setQuizAnswer] = useState('');
   const [quizFeedback, setQuizFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  const [progress, setProgress] = useState<Record<string, boolean>>({});
 
   const currentData = activeTab === 'hiragana' ? hiraganaData : katakanaData;
   const groups = [...new Set(currentData.map(k => k.group))];
 
-  const masteredCount = currentData.filter(k => mockProgress[k.char]).length;
+  // Load progress from API
+  useEffect(() => {
+    async function loadProgress() {
+      try {
+        const res = await fetch('/api/progress?module=kana');
+        if (res.ok) {
+          const data = await res.json();
+          const progressMap: Record<string, boolean> = {};
+          data.progress.forEach((p: { itemId: string; mastered: boolean }) => {
+            progressMap[p.itemId] = p.mastered;
+          });
+          setProgress(progressMap);
+        }
+      } catch {
+        // Use empty progress
+      }
+    }
+    loadProgress();
+  }, []);
+
+  const masteredCount = currentData.filter(k => progress[k.char]).length;
   const progressPercentage = Math.round((masteredCount / currentData.length) * 100);
 
   const handleKanaClick = (kana: typeof hiraganaData[0]) => {
@@ -91,11 +98,30 @@ export default function KanaPage() {
     setQuizFeedback(null);
   };
 
-  const handleQuizSubmit = () => {
-    if (selectedKana && quizAnswer.toLowerCase() === selectedKana.romaji) {
-      setQuizFeedback('correct');
-    } else {
-      setQuizFeedback('incorrect');
+  const handleQuizSubmit = async () => {
+    if (!selectedKana) return;
+
+    const isCorrect = quizAnswer.toLowerCase() === selectedKana.romaji;
+    setQuizFeedback(isCorrect ? 'correct' : 'incorrect');
+
+    if (isCorrect) {
+      // Save progress to database
+      try {
+        await fetch('/api/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            module: 'kana',
+            itemId: selectedKana.char,
+            mastered: true,
+          }),
+        });
+
+        // Update local state
+        setProgress(prev => ({ ...prev, [selectedKana.char]: true }));
+      } catch {
+        // Failed to save progress
+      }
     }
   };
 
@@ -176,7 +202,7 @@ export default function KanaPage() {
                   {currentData
                     .filter(k => k.group === group)
                     .map((kana) => {
-                      const isMastered = mockProgress[kana.char];
+                      const isMastered = progress[kana.char];
                       const isSelected = selectedKana?.char === kana.char;
 
                       return (
@@ -233,8 +259,8 @@ export default function KanaPage() {
                   </div>
                   <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
                     <span className="text-[10px]">状态</span>
-                    <PixelBadge variant={mockProgress[selectedKana.char] ? 'success' : 'default'}>
-                      {mockProgress[selectedKana.char] ? '已掌握済み' : '未学习'}
+                    <PixelBadge variant={progress[selectedKana.char] ? 'success' : 'default'}>
+                      {progress[selectedKana.char] ? '已掌握' : '未学习'}
                     </PixelBadge>
                   </div>
                 </div>
@@ -249,6 +275,7 @@ export default function KanaPage() {
                         type="text"
                         value={quizAnswer}
                         onChange={(e) => setQuizAnswer(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleQuizSubmit()}
                         className="flex-1 px-3 py-2 border-2 border-black font-pixel text-xs"
                         placeholder="输入罗马音..."
                       />
@@ -291,7 +318,7 @@ export default function KanaPage() {
       <footer className="border-t-4 border-black bg-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-4 text-center">
           <p className="text-[10px] text-[#666666]">
-            © 2024 kanaAI - 每天进步一点点！
+            © 2026 kanaAI - 每天进步一点点！
           </p>
         </div>
       </footer>
