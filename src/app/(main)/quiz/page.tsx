@@ -2,53 +2,47 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge } from '@/components/ui';
 
-// 示例题目
 const sampleQuestions = [
   {
-    id: 1,
-    type: 'choice',
-    question: '「あ」のローマ字は？',
-    questionCn: '「あ」的罗马音是？',
+    id: 1, type: 'choice',
+    question: '「あ」のローマ字は?',
+    questionCn: '「あ」的罗马音是?',
     options: ['a', 'i', 'u', 'e'],
     correct: 0,
-    explanation: '「あ」は「a」です。（「あ」是「a」。）',
+    explanation: '「あ」は「a」です。',
   },
   {
-    id: 2,
-    type: 'choice',
-    question: '「ありがとう」の意味は？',
-    questionCn: '「ありがとう」的意思是？',
+    id: 2, type: 'choice',
+    question: '「ありがとう」の意味は?',
+    questionCn: '「ありがとう」的意思是?',
     options: ['你好', '谢谢', '对不起', '再见'],
     correct: 1,
-    explanation: '「ありがとう」は「谢谢」です。（「ありがとう」是「谢谢」。）',
+    explanation: '「ありがとう」は「谢谢」です。',
   },
   {
-    id: 3,
-    type: 'choice',
-    question: '「水」は何ですか？',
-    questionCn: '「水」是什么？',
+    id: 3, type: 'choice',
+    question: '「水」は何ですか?',
+    questionCn: '「水」是什么?',
     options: ['みず', 'みつ', 'みち', 'みと'],
     correct: 0,
-    explanation: '「水」は「みず」(mizu)です。（「水」是「みず」。）',
+    explanation: '「水」は「みず」(mizu)です。',
   },
   {
-    id: 4,
-    type: 'input',
+    id: 4, type: 'input',
     question: '「一」のローマ字を入力してください',
     questionCn: '请输入「一」的罗马音',
     correct: 'ichi',
-    explanation: '「一」は「ichi」です。（「一」是「ichi」。）',
+    explanation: '「一」は「ichi」です。',
   },
   {
-    id: 5,
-    type: 'choice',
-    question: '「お父さん」の意味は？',
-    questionCn: '「お父さん」的意思是？',
+    id: 5, type: 'choice',
+    question: '「お父さん」の意味は?',
+    questionCn: '「お父さん」的意思是?',
     options: ['妈妈', '爸爸', '哥哥', '姐姐'],
     correct: 1,
-    explanation: '「お父さん」は「爸爸」です。（「お父さん」是「爸爸」。）',
+    explanation: '「お父さん」は「爸爸」です。',
   },
 ];
 
@@ -59,8 +53,10 @@ export default function QuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [savedResult, setSavedResult] = useState(false);
 
   const question = sampleQuestions[currentQuestion];
+  const scorePercentage = Math.round((score / sampleQuestions.length) * 100);
 
   const handleAnswer = () => {
     if (question.type === 'choice' && selectedAnswer === null) return;
@@ -72,9 +68,7 @@ export default function QuizPage() {
       ? selectedAnswer === question.correct
       : inputAnswer.toLowerCase() === question.correct;
 
-    if (isCorrect) {
-      setScore(prev => prev + 1);
-    }
+    if (isCorrect) setScore(prev => prev + 1);
   };
 
   const handleNext = () => {
@@ -95,94 +89,81 @@ export default function QuizPage() {
     setShowResult(false);
     setScore(0);
     setIsFinished(false);
+    setSavedResult(false);
   };
 
-  const scorePercentage = Math.round((score / sampleQuestions.length) * 100);
-
-  // Save quiz result when finished
-  const saveQuizResult = async () => {
-    try {
-      await fetch('/api/quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'kana-vocab',
-          score,
-          total: sampleQuestions.length,
-          details: {
-            questions: sampleQuestions.map((q, i) => ({
-              question: q.questionCn,
-              correct: q.correct,
-            })),
-            scorePercentage,
-          },
-        }),
-      });
-    } catch {
-      // Failed to save quiz result
-    }
-  };
-
-  // Save when quiz finishes
-  if (isFinished && score > 0) {
-    saveQuizResult();
+  // Save result when finished
+  if (isFinished && !savedResult) {
+    setSavedResult(true);
+    fetch('/api/quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'kana-vocab',
+        score,
+        total: sampleQuestions.length,
+        details: { scorePercentage },
+      }),
+    }).catch(() => {});
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
-      {/* Header */}
-      <header className="border-b-4 border-black bg-white shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#FF1C1C] border-3 border-black flex items-center justify-center">
-                <span className="text-white text-lg">あ</span>
-              </div>
-              <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
-            </Link>
-          </div>
+    <div className="min-h-screen relative z-10">
+      <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-baseline gap-2">
+            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
+            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
+          </Link>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 戻る</PixelButton>
           </Link>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">智能测验</h2>
-          <p className="text-[10px] text-[#666666]">
-            测试你学到的内容！
-          </p>
-        </div>
-
+      <main className="max-w-4xl mx-auto px-6 py-12">
         {!isFinished ? (
           <>
-            {/* Progress */}
-            <PixelCard className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs">题目 {currentQuestion + 1}/{sampleQuestions.length}</span>
-                <PixelBadge variant="exp">得分: {score}</PixelBadge>
+            {/* Title */}
+            <section className="mb-8 fade-up">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <div className="label-text mb-2">第 04 章 — 試験</div>
+                  <h1 className="heading-lg">確認テスト</h1>
+                </div>
+                <div className="text-right">
+                  <div className="label-text opacity-50">問題</div>
+                  <div className="font-mono text-2xl tabular-nums">
+                    {String(currentQuestion + 1).padStart(2, '0')}<span className="opacity-30">/</span>{String(sampleQuestions.length).padStart(2, '0')}
+                  </div>
+                </div>
               </div>
-              <PixelProgress
-                value={currentQuestion + 1}
-                max={sampleQuestions.length}
-                variant="exp"
-              />
-            </PixelCard>
+              <div className="mt-4 progress-track">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${((currentQuestion + 1) / sampleQuestions.length) * 100}%` }}
+                />
+              </div>
+            </section>
 
             {/* Question */}
-            <PixelCard variant="elevated">
-              <div className="mb-6">
-                <PixelBadge variant="level" className="mb-3">
-                  {question.type === 'choice' ? '選択题目' : '入力题目'}
+            <PixelCard className="fade-up" >
+              <div className="flex items-baseline justify-between mb-4">
+                <PixelBadge variant="ink">
+                  {question.type === 'choice' ? '選択' : '入力'}
                 </PixelBadge>
-                <h3 className="text-sm mb-2">{question.question}</h3>
-                <p className="text-[10px] text-[#666666]">{question.questionCn}</p>
+                <div className="font-mono text-[0.7rem] opacity-50 tracking-wider">
+                  Q. {String(currentQuestion + 1).padStart(2, '0')}
+                </div>
               </div>
 
-              {/* Answer Options */}
+              <h2 className="font-display text-2xl font-medium mb-2">{question.question}</h2>
+              <p className="body-text opacity-70 mb-6">{question.questionCn}</p>
+
+              <div className="divider-line mb-6"></div>
+
               {question.type === 'choice' ? (
-                <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="space-y-2 mb-6">
                   {question.options?.map((option, index) => {
                     const isSelected = selectedAnswer === index;
                     const isCorrect = index === question.correct;
@@ -194,155 +175,138 @@ export default function QuizPage() {
                         key={index}
                         onClick={() => !showResult && setSelectedAnswer(index)}
                         disabled={showResult}
-                        className={`
-                          p-4 border-3 border-black text-left transition-all
-                          ${showCorrect ? 'bg-[#4ADE80]' : ''}
-                          ${showIncorrect ? 'bg-[#EF4444] text-white' : ''}
-                          ${!showResult && isSelected ? 'bg-[#3B82F6] text-white' : ''}
-                          ${!showResult && !isSelected ? 'bg-white hover:bg-[#FFD700]' : ''}
-                        `}
+                        className={`w-full p-4 border-[1.5px] text-left transition-all duration-200 flex items-center gap-4 ${
+                          showCorrect
+                            ? 'border-[var(--sage)] bg-[var(--sage)] bg-opacity-10'
+                            : showIncorrect
+                            ? 'border-[var(--vermillion)] bg-[var(--vermillion)] bg-opacity-10'
+                            : isSelected
+                            ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
+                            : 'border-[var(--ink)] border-opacity-20 hover:border-opacity-80 bg-[var(--paper)]'
+                        }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className={`
-                            w-8 h-8 border-2 border-black flex items-center justify-center
-                            ${isSelected ? 'bg-white' : 'bg-transparent'}
-                          `}>
-                            {String.fromCharCode(65 + index)}
-                          </div>
-                          <span className="text-xs">{option}</span>
-                        </div>
+                        <span className={`font-mono text-[0.7rem] w-6 ${isSelected && !showResult ? 'opacity-80' : 'opacity-50'}`}>
+                          {String.fromCharCode(65 + index)}
+                        </span>
+                        <span className="font-display text-base flex-1">{option}</span>
+                        {showCorrect && <span className="font-display" style={{ color: 'var(--sage)' }}>✓</span>}
+                        {showIncorrect && <span className="font-display" style={{ color: 'var(--vermillion)' }}>✗</span>}
                       </button>
                     );
                   })}
                 </div>
               ) : (
                 <div className="mb-6">
+                  <label className="input-label">あなたの答え</label>
                   <input
                     type="text"
                     value={inputAnswer}
                     onChange={(e) => setInputAnswer(e.target.value)}
                     disabled={showResult}
                     placeholder="ローマ字を入力..."
-                    className={`
-                      w-full px-4 py-3 border-3 border-black font-pixel text-xs
-                      ${showResult
+                    className={`input-field ${
+                      showResult
                         ? inputAnswer.toLowerCase() === question.correct
-                          ? 'bg-[#4ADE80]'
-                          : 'bg-[#EF4444] text-white'
+                          ? 'border-[var(--sage)] text-[var(--sage)]'
+                          : 'border-[var(--vermillion)] text-[var(--vermillion)]'
                         : ''
-                      }
-                    `}
+                    }`}
+                    autoFocus
                   />
+                  {showResult && inputAnswer.toLowerCase() !== question.correct && (
+                    <p className="mt-2 text-[0.8rem] font-mono opacity-60">
+                      正解: <span style={{ color: 'var(--sage)' }}>{question.correct}</span>
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* Result */}
               {showResult && (
-                <div className={`
-                  p-4 border-3 border-black mb-6
-                  ${(question.type === 'choice' && selectedAnswer === question.correct) ||
-                    (question.type === 'input' && inputAnswer.toLowerCase() === question.correct)
-                    ? 'bg-[#4ADE80]'
-                    : 'bg-[#EF4444] text-white'
-                  }
-                `}>
-                  <p className="text-xs mb-2">
+                <div className={`mb-6 p-4 border-l-[3px] fade-up ${
+                  (question.type === 'choice' && selectedAnswer === question.correct) ||
+                  (question.type === 'input' && inputAnswer.toLowerCase() === question.correct)
+                    ? 'border-[var(--sage)] bg-[var(--sage)] bg-opacity-5'
+                    : 'border-[var(--vermillion)] bg-[var(--vermillion)] bg-opacity-5'
+                }`}>
+                  <div className="label-text mb-1" style={{ color: (question.type === 'choice' && selectedAnswer === question.correct) || (question.type === 'input' && inputAnswer.toLowerCase() === question.correct) ? 'var(--sage)' : 'var(--vermillion)' }}>
                     {(question.type === 'choice' && selectedAnswer === question.correct) ||
                      (question.type === 'input' && inputAnswer.toLowerCase() === question.correct)
-                      ? '🎉 正解！'
-                      : '❌ 不正解'
-                    }
-                  </p>
-                  <p className="text-[10px]">{question.explanation}</p>
+                      ? '正解'
+                      : '不正解'}
+                  </div>
+                  <p className="body-text">{question.explanation}</p>
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3">
+              <div className="flex justify-end pt-4 border-t-[1px] border-[var(--ink)] border-opacity-15">
                 {!showResult ? (
-                  <PixelButton onClick={handleAnswer}>
-                    回答
+                  <PixelButton onClick={handleAnswer} variant="primary">
+                    回答する →
                   </PixelButton>
                 ) : (
-                  <PixelButton onClick={handleNext}>
-                    {currentQuestion < sampleQuestions.length - 1 ? '次の题目' : '查看结果'}
+                  <PixelButton onClick={handleNext} variant="primary">
+                    {currentQuestion < sampleQuestions.length - 1 ? '次の問題 →' : '結果を見る →'}
                   </PixelButton>
                 )}
               </div>
             </PixelCard>
           </>
         ) : (
-          /* Result Screen */
-          <PixelCard variant="elevated">
-            <div className="text-center py-8">
-              <h3 className="text-lg mb-4">测验结果</h3>
-
-              <div className="w-32 h-32 mx-auto mb-6 border-4 border-black flex items-center justify-center bg-white">
-                <span className="text-4xl">
-                  {scorePercentage >= 80 ? '🎉' : scorePercentage >= 60 ? '👍' : '📚'}
-                </span>
-              </div>
-
-              <div className="text-3xl mb-2">{scorePercentage}点</div>
-              <p className="text-xs text-[#666666] mb-6">
-                {sampleQuestions.length}题中{score}题正确
+          /* Result */
+          <section className="fade-up">
+            <div className="mb-8 text-center">
+              <div className="label-text mb-2" style={{ color: 'var(--vermillion)' }}>結果発表</div>
+              <h1 className="heading-xl mb-3">
+                {scorePercentage} <span className="text-[0.5em] opacity-50">点</span>
+              </h1>
+              <p className="body-text opacity-70">
+                {sampleQuestions.length} 問中 {score} 問正解
               </p>
+            </div>
 
-              <PixelProgress
-                value={score}
-                max={sampleQuestions.length}
-                variant={scorePercentage >= 80 ? 'exp' : scorePercentage >= 60 ? 'default' : 'hp'}
-                className="mb-6"
-              />
+            <PixelCard className="mb-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 halftone-red w-40 h-40 opacity-15 pointer-events-none"></div>
+              <div className="relative">
+                <div className="mb-6">
+                  <PixelProgress value={score} max={sampleQuestions.length} variant="vermillion" showLabel label="正解率" />
+                </div>
 
-              <div className="flex flex-col gap-3">
-                {scorePercentage >= 80 ? (
-                  <PixelDialog>
-                    <p>太棒了！做得很好！</p>
-                    <p className="text-[#666666] text-[10px] mt-2">
-                      （太棒了！做得很好！）
-                    </p>
-                  </PixelDialog>
-                ) : scorePercentage >= 60 ? (
-                  <PixelDialog>
-                    <p>再努力一点吧！</p>
-                    <p className="text-[#666666] text-[10px] mt-2">
-                      （再努力一点吧！）
-                    </p>
-                  </PixelDialog>
-                ) : (
-                  <PixelDialog>
-                    <p>复习后再挑战一次吧！</p>
-                    <p className="text-[#666666] text-[10px] mt-2">
-                      （复习后再挑战一次吧！）
-                    </p>
-                  </PixelDialog>
-                )}
+                <div className="divider-line mb-6"></div>
 
-                <div className="flex justify-center gap-4">
-                  <PixelButton onClick={handleRestart}>
-                    もう一度
+                <div className="text-center py-4">
+                  {scorePercentage >= 80 ? (
+                    <>
+                      <div className="font-display text-2xl mb-2" style={{ color: 'var(--vermillion)' }}>素晴らしい!</div>
+                      <p className="body-text opacity-70">とても良い調子です。このまま頑張りましょう。</p>
+                    </>
+                  ) : scorePercentage >= 60 ? (
+                    <>
+                      <div className="font-display text-2xl mb-2" style={{ color: 'var(--cobalt)' }}>いい感じです</div>
+                      <p className="body-text opacity-70">あと少し!間違えた問題を復習しましょう。</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="font-display text-2xl mb-2" style={{ color: 'var(--mustard-dark)' }}>もう一度!</div>
+                      <p className="body-text opacity-70">基礎から復習して、もう一度挑戦してみましょう。</p>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <PixelButton onClick={handleRestart} variant="primary" className="flex-1">
+                    もう一度挑戦
                   </PixelButton>
-                  <Link href="/dashboard">
-                    <PixelButton variant="secondary">
-                      返回仪表板
+                  <Link href="/dashboard" className="flex-1">
+                    <PixelButton variant="secondary" className="w-full">
+                      ダッシュボードへ
                     </PixelButton>
                   </Link>
                 </div>
               </div>
-            </div>
-          </PixelCard>
+            </PixelCard>
+          </section>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t-4 border-black bg-white mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-4 text-center">
-          <p className="text-[10px] text-[#666666]">
-            © 2026 kanaAI - 每天进步一点点！
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

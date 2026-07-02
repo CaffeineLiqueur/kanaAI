@@ -1,24 +1,22 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-pixel: 'Press Start 2P', cursive;
-  --color-primary: #FF1C1C;
-  --color-primary-dark: #CC0000;
-  --color-primary-light: #FF6666;
-  --color-secondary: #3B82F6;
-  --color-secondary-dark: #2563EB;
-  --color-secondary-light: #60A5FA;
-  --color-accent: #FFD700;
-  --color-accent-dark: #FFA500;
-  --color-bg: #F5F0E1;
-  --color-bg-dark: #E8E0CC;
-  --color-text: #2D2D2D;
-  --color-text-light: #666666;
-  --color-success: #4ADE80;
-  --color-error: #EF4444;
-}
+  /* 和风 Riso 配色 - 暖白纸 + 朱红 + 钴蓝 + 芥末 */
+  --color-ink: #0F0F1A;
+  --color-ink-soft: #1A1A28;
+  --color-paper: #FAF7F2;
+  --color-paper-warm: #F0EBE0;
+  --color-paper-deep: #E5DFD0;
+  --color-vermillion: #C8102E;
+  --color-vermillion-dark: #9B0C24;
+  --color-cobalt: #1E3A8A;
+  --color-cobalt-dark: #152C6B;
+  --color-mustard: #D4A04A;
+  --color-mustard-dark: #A87C2E;
+  --color-sage: #5B7553;
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
+  /* 字体 */
+  --font-display: 'Shippori Antique', serif;
+  --font-body: 'Klee One', cursive;
+  --font-mono: 'JetBrains Mono', monospace;
 }

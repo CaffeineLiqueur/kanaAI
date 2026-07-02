@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PixelDialog, PlayButton } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge } from '@/components/ui';
+import { PlayButton } from '@/components/ui';
 
-// 平假名数据
 const hiraganaData = [
   { char: 'あ', romaji: 'a', group: 'あ行' },
   { char: 'い', romaji: 'i', group: 'あ行' },
@@ -33,7 +33,6 @@ const hiraganaData = [
   { char: 'の', romaji: 'no', group: 'な行' },
 ];
 
-// 片假名数据
 const katakanaData = [
   { char: 'ア', romaji: 'a', group: 'ア行' },
   { char: 'イ', romaji: 'i', group: 'ア行' },
@@ -63,7 +62,6 @@ export default function KanaPage() {
   const currentData = activeTab === 'hiragana' ? hiraganaData : katakanaData;
   const groups = [...new Set(currentData.map(k => k.group))];
 
-  // Load progress from API
   useEffect(() => {
     async function loadProgress() {
       try {
@@ -76,15 +74,12 @@ export default function KanaPage() {
           });
           setProgress(progressMap);
         }
-      } catch {
-        // Use empty progress
-      }
+      } catch {}
     }
     loadProgress();
   }, []);
 
   const masteredCount = currentData.filter(k => progress[k.char]).length;
-  const progressPercentage = Math.round((masteredCount / currentData.length) * 100);
 
   const handleKanaClick = (kana: typeof hiraganaData[0]) => {
     setSelectedKana(kana);
@@ -100,12 +95,10 @@ export default function KanaPage() {
 
   const handleQuizSubmit = async () => {
     if (!selectedKana) return;
-
     const isCorrect = quizAnswer.toLowerCase() === selectedKana.romaji;
     setQuizFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      // Save progress to database
       try {
         await fetch('/api/progress', {
           method: 'POST',
@@ -116,89 +109,95 @@ export default function KanaPage() {
             mastered: true,
           }),
         });
-
-        // Update local state
         setProgress(prev => ({ ...prev, [selectedKana.char]: true }));
-      } catch {
-        // Failed to save progress
-      }
+      } catch {}
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
+    <div className="min-h-screen relative z-10">
       {/* Header */}
-      <header className="border-b-4 border-black bg-white shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#FF1C1C] border-3 border-black flex items-center justify-center">
-                <span className="text-white text-lg">あ</span>
-              </div>
-              <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
-            </Link>
-          </div>
+      <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-baseline gap-2">
+            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
+            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
+          </Link>
           <Link href="/dashboard">
-            <PixelButton variant="ghost" size="sm">← 返回仪表板</PixelButton>
+            <PixelButton variant="ghost" size="sm">← 戻る</PixelButton>
           </Link>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-6 py-12">
         {/* Title */}
-        <div className="mb-8">
-          <h2 className="text-lg text-[#2D2D2D] mb-2">假名学习</h2>
-          <p className="text-[10px] text-[#666666]">
-            轻松掌握日语假名，像收集图鉴一样有趣！
-          </p>
-        </div>
-
-        {/* Progress Overview */}
-        <PixelCard className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h3 className="text-xs mb-2">学习进度</h3>
-              <PixelProgress
-                value={progressPercentage}
-                label={`${masteredCount}/${currentData.length} 已掌握`}
-                variant="exp"
-                showLabel
-              />
+        <section className="mb-10 fade-up">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+            <div className="md:col-span-7">
+              <div className="label-text mb-2">第 01 章</div>
+              <h1 className="heading-lg mb-2">
+                仮名<span style={{ color: 'var(--vermillion)' }}> · </span>
+                <span className="writing-vertical text-[1.2rem] inline-block align-middle opacity-60">五十音</span>
+              </h1>
+              <p className="body-text opacity-70">日本語の土台 — 五十音を一つずつマスターしよう。</p>
             </div>
-            <div className="flex gap-4">
-              <PixelBadge variant="exp">
-                已掌握: {masteredCount}
-              </PixelBadge>
-              <PixelBadge variant="default">
-                未学习: {currentData.length - masteredCount}
-              </PixelBadge>
+            <div className="md:col-span-5">
+              <PixelCard>
+                <div className="space-y-2">
+                  <div className="flex items-baseline justify-between">
+                    <span className="label-text" style={{ color: 'var(--vermillion)' }}>習得</span>
+                    <span className="font-mono text-[0.85rem] tabular-nums">
+                      {masteredCount}<span className="opacity-40">/</span>{currentData.length}
+                    </span>
+                  </div>
+                  <PixelProgress
+                    value={masteredCount}
+                    max={currentData.length}
+                    variant="vermillion"
+                  />
+                </div>
+              </PixelCard>
             </div>
           </div>
-        </PixelCard>
+        </section>
 
-        {/* Tab Buttons */}
-        <div className="flex gap-4 mb-6">
-          <PixelButton
-            variant={activeTab === 'hiragana' ? 'primary' : 'ghost'}
+        {/* Tabs */}
+        <div className="mb-8 flex items-center gap-6 border-b-[1.5px] border-[var(--ink)]">
+          <button
             onClick={() => setActiveTab('hiragana')}
+            className={`py-3 -mb-[1.5px] border-b-[2px] transition-colors font-display ${
+              activeTab === 'hiragana'
+                ? 'border-[var(--vermillion)] text-[var(--ink)]'
+                : 'border-transparent opacity-50 hover:opacity-80'
+            }`}
           >
-            平仮名 ひらがな
-          </PixelButton>
-          <PixelButton
-            variant={activeTab === 'katakana' ? 'primary' : 'ghost'}
+            <span className="text-[0.7rem] block opacity-60 mb-0.5">No. 01</span>
+            <span className="text-base font-medium">平仮名 · Hiragana</span>
+          </button>
+          <button
             onClick={() => setActiveTab('katakana')}
+            className={`py-3 -mb-[1.5px] border-b-[2px] transition-colors font-display ${
+              activeTab === 'katakana'
+                ? 'border-[var(--cobalt)] text-[var(--ink)]'
+                : 'border-transparent opacity-50 hover:opacity-80'
+            }`}
           >
-            片假名 カタカナ
-          </PixelButton>
+            <span className="text-[0.7rem] block opacity-60 mb-0.5">No. 02</span>
+            <span className="text-base font-medium">片仮名 · Katakana</span>
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Kana Grid */}
-          <div className="lg:col-span-2">
-            {groups.map((group) => (
-              <div key={group} className="mb-6">
-                <h3 className="text-xs mb-3 text-[#666666]">{group}</h3>
-                <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Kana grid */}
+          <div className="lg:col-span-7">
+            {groups.map((group, gi) => (
+              <div key={group} className="mb-8 fade-up" style={{ animationDelay: `${gi * 60}ms` }}>
+                <div className="flex items-baseline gap-3 mb-3">
+                  <h3 className="font-display text-sm font-medium">{group}</h3>
+                  <span className="h-[1px] flex-1 bg-[var(--ink)] opacity-15"></span>
+                  <span className="label-text opacity-40">{group}行</span>
+                </div>
+                <div className="grid grid-cols-5 gap-2">
                   {currentData
                     .filter(k => k.group === group)
                     .map((kana) => {
@@ -209,16 +208,16 @@ export default function KanaPage() {
                         <button
                           key={kana.char}
                           onClick={() => handleKanaClick(kana)}
-                          className={`
-                            w-16 h-16 border-3 border-black flex flex-col items-center justify-center
-                            transition-all duration-100
-                            ${isSelected ? 'bg-[#3B82F6] text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]' : ''}
-                            ${!isSelected && isMastered ? 'bg-[#4ADE80]' : ''}
-                            ${!isSelected && !isMastered ? 'bg-white hover:bg-[#FFD700]' : ''}
-                          `}
+                          className={`aspect-square border-[1.5px] flex flex-col items-center justify-center transition-all duration-200 ${
+                            isSelected
+                              ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
+                              : isMastered
+                              ? 'border-[var(--sage)] bg-[var(--sage)] bg-opacity-10 text-[var(--ink)]'
+                              : 'border-[var(--ink)] border-opacity-15 hover:border-opacity-60 bg-[var(--paper)] text-[var(--ink)]'
+                          }`}
                         >
-                          <span className="text-xl">{kana.char}</span>
-                          <span className={`text-[8px] ${isSelected ? 'text-white' : 'text-[#666666]'}`}>
+                          <span className="font-display text-2xl font-medium">{kana.char}</span>
+                          <span className={`text-[0.6rem] font-mono mt-0.5 ${isSelected ? 'opacity-80' : 'opacity-50'}`}>
                             {kana.romaji}
                           </span>
                         </button>
@@ -229,99 +228,101 @@ export default function KanaPage() {
             ))}
           </div>
 
-          {/* Detail Panel */}
-          <div>
+          {/* Detail panel */}
+          <div className="lg:col-span-5">
             {selectedKana ? (
-              <PixelCard variant="elevated">
-                <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-white border-4 border-black mx-auto mb-4 flex items-center justify-center relative">
-                    <span className="text-5xl">{selectedKana.char}</span>
-                    <div className="absolute -bottom-1 -right-1">
-                      <PlayButton text={selectedKana.char} size="sm" />
-                    </div>
-                  </div>
-                  <h3 className="text-sm mb-1">{selectedKana.char}</h3>
-                  <p className="text-[10px] text-[#666666]">{selectedKana.romaji}</p>
-                </div>
+              <div className="sticky top-8">
+                <PixelCard className="relative overflow-hidden">
+                  <div className="absolute top-0 right-0 halftone-cobalt w-32 h-32 opacity-20 pointer-events-none"></div>
 
-                <div className="flex flex-col gap-3 mb-6">
-                  <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">假名</span>
-                    <span className="text-xs">{selectedKana.char}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">罗马音</span>
-                    <span className="text-xs">{selectedKana.romaji}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">分组</span>
-                    <span className="text-xs">{selectedKana.group}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-white border-2 border-black">
-                    <span className="text-[10px]">状态</span>
-                    <PixelBadge variant={progress[selectedKana.char] ? 'success' : 'default'}>
-                      {progress[selectedKana.char] ? '已掌握' : '未学习'}
-                    </PixelBadge>
-                  </div>
-                </div>
+                  <div className="relative">
+                    <div className="label-text mb-2">{selectedKana.group}</div>
 
-                {/* Quiz Section */}
-                {showQuiz ? (
-                  <div className="p-4 bg-[#FFD700] border-3 border-black">
-                    <h4 className="text-xs mb-3">小测验！</h4>
-                    <p className="text-[10px] mb-3">「{selectedKana.char}」的罗马音是？</p>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={quizAnswer}
-                        onChange={(e) => setQuizAnswer(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleQuizSubmit()}
-                        className="flex-1 px-3 py-2 border-2 border-black font-pixel text-xs"
-                        placeholder="输入罗马音..."
-                      />
-                      <PixelButton size="sm" onClick={handleQuizSubmit}>
-                        回答
-                      </PixelButton>
-                    </div>
-                    {quizFeedback && (
-                      <div className={`mt-3 p-2 border-2 border-black text-[10px] ${
-                        quizFeedback === 'correct' ? 'bg-[#4ADE80]' : 'bg-[#EF4444] text-white'
-                      }`}>
-                        {quizFeedback === 'correct'
-                          ? '🎉 回答正确！すごい！（正确！太棒了！）'
-                          : `❌ 回答错误。正解は「${selectedKana.romaji}」です（错误。正确答案是「${selectedKana.romaji}」）`
-                        }
+                    <div className="flex items-baseline gap-3 mb-6">
+                      <span className="font-display text-7xl font-medium">{selectedKana.char}</span>
+                      <div className="flex flex-col">
+                        <span className="font-mono text-xl">{selectedKana.romaji}</span>
+                        <span className="caption-text">romaji</span>
                       </div>
+                      <div className="ml-auto">
+                        <PlayButton text={selectedKana.char} size="md" />
+                      </div>
+                    </div>
+
+                    <div className="divider-line mb-5"></div>
+
+                    <dl className="space-y-3 mb-6">
+                      <div className="flex justify-between items-baseline">
+                        <dt className="label-text opacity-60">仮名</dt>
+                        <dd className="font-display text-base">{selectedKana.char}</dd>
+                      </div>
+                      <div className="flex justify-between items-baseline">
+                        <dt className="label-text opacity-60">ローマ字</dt>
+                        <dd className="font-mono text-base">{selectedKana.romaji}</dd>
+                      </div>
+                      <div className="flex justify-between items-baseline">
+                        <dt className="label-text opacity-60">行</dt>
+                        <dd className="font-body text-base">{selectedKana.group}</dd>
+                      </div>
+                      <div className="flex justify-between items-baseline">
+                        <dt className="label-text opacity-60">状態</dt>
+                        <dd>
+                          {progress[selectedKana.char] ? (
+                            <PixelBadge variant="success" filled>習得済</PixelBadge>
+                          ) : (
+                            <PixelBadge variant="default">未学習</PixelBadge>
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    {showQuiz ? (
+                      <div className="border-t-[1.5px] border-[var(--ink)] pt-5">
+                        <div className="label-text mb-2" style={{ color: 'var(--vermillion)' }}>小テスト</div>
+                        <p className="body-text mb-3">「{selectedKana.char}」のローマ字は?</p>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={quizAnswer}
+                            onChange={(e) => setQuizAnswer(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleQuizSubmit()}
+                            className="input-field flex-1"
+                            placeholder="入力..."
+                            autoFocus
+                          />
+                          <PixelButton onClick={handleQuizSubmit} size="sm">回答</PixelButton>
+                        </div>
+                        {quizFeedback && (
+                          <div className={`mt-3 p-3 text-[0.85rem] font-body border-l-[3px] ${
+                            quizFeedback === 'correct'
+                              ? 'border-[var(--sage)] bg-[var(--sage)] bg-opacity-10'
+                              : 'border-[var(--vermillion)] bg-[var(--vermillion)] bg-opacity-10'
+                          }`}>
+                            {quizFeedback === 'correct'
+                              ? '✓ 正解 — すごい!'
+                              : `× 不正解 — 正解は「${selectedKana.romaji}」`}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <PixelButton onClick={handleStartQuiz} variant="primary" className="w-full">
+                        小テストを始める
+                      </PixelButton>
                     )}
                   </div>
-                ) : (
-                  <PixelButton className="w-full" onClick={handleStartQuiz}>
-                    开始测验！
-                  </PixelButton>
-                )}
-              </PixelCard>
+                </PixelCard>
+              </div>
             ) : (
               <PixelCard>
-                <PixelDialog>
-                  <p>请选择一个假名</p>
-                  <p className="text-[#666666] text-[10px] mt-2">
-                    （请选择一个假名）
-                  </p>
-                </PixelDialog>
+                <div className="text-center py-8">
+                  <div className="writing-vertical text-3xl opacity-30 mx-auto mb-4 inline-block">仮名を選ぶ</div>
+                  <p className="caption-text">左の表から文字をクリックして、詳細を確認しよう。</p>
+                </div>
               </PixelCard>
             )}
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t-4 border-black bg-white mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-4 text-center">
-          <p className="text-[10px] text-[#666666]">
-            © 2026 kanaAI - 每天进步一点点！
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

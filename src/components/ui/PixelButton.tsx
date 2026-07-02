@@ -10,26 +10,26 @@ interface PixelButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(
   ({ className, variant = 'primary', size = 'md', children, ...props }, ref) => {
-    const baseStyles = 'pixel-button transition-all duration-100 font-pixel';
-
     const variants = {
-      primary: 'bg-[#FF1C1C] hover:bg-[#E01818] text-white',
-      secondary: 'bg-[#3B82F6] hover:bg-[#2563EB] text-white',
-      accent: 'bg-[#FFD700] hover:bg-[#E6C200] text-[#2D2D2D]',
-      ghost: 'bg-transparent border-2 border-[#2D2D2D] hover:bg-[#2D2D2D] hover:text-white shadow-none',
+      primary: 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)] hover:bg-[var(--vermillion)] hover:border-[var(--vermillion)]',
+      secondary: 'bg-transparent text-[var(--ink)] border-[var(--ink)] hover:bg-[var(--ink)] hover:text-[var(--paper)]',
+      accent: 'bg-[var(--vermillion)] text-[var(--paper)] border-[var(--vermillion)] hover:bg-[var(--vermillion-dark)] hover:border-[var(--vermillion-dark)]',
+      ghost: 'bg-transparent text-[var(--ink)] border-transparent hover:text-[var(--vermillion)]',
     };
 
     const sizes = {
-      sm: 'text-[10px] px-3 py-2',
-      md: 'text-xs px-5 py-3',
-      lg: 'text-sm px-8 py-4',
+      sm: 'text-[0.7rem] px-3 py-1.5',
+      md: 'text-[0.85rem] px-5 py-2.5',
+      lg: 'text-[1rem] px-7 py-3.5',
     };
 
     return (
       <button
         ref={ref}
         className={cn(
-          baseStyles,
+          'inline-flex items-center justify-center gap-2 font-display font-medium tracking-wider',
+          'border-[1.5px] transition-all duration-200 ease-out',
+          'active:translate-y-[1px] disabled:opacity-50 disabled:pointer-events-none',
           variants[variant],
           sizes[size],
           className

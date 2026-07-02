@@ -4,8 +4,8 @@ import "./pixel-theme.css";
 import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "kanaAI - AI日语学习",
-  description: "宝可梦风格的AI日语学习应用，像素宠物陪伴",
+  title: "kanaAI — 日本語を学ぶ",
+  description: "AI を活用した日本語学習プラットフォーム。像素ペットと一緒に、ゼロから日本語を学ぼう。",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className="h-full">
-      <body className="min-h-full flex flex-col bg-[#F5F0E1] font-pixel">
+      <body className="min-h-full flex flex-col paper-bg font-body text-[var(--ink)]">
         <Providers>
           {children}
         </Providers>

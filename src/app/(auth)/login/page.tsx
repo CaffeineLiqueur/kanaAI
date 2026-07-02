@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelInput, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelInput, PixelBadge } from '@/components/ui';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,22 +27,20 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || '登录失败');
+        setError(data.error || 'ログインに失敗しました');
         return;
       }
 
       router.push('/dashboard');
     } catch {
-      setError('网络错误，请稍后重试');
+      setError('ネットワークエラー');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 开发模式：跳过登录
   const handleDevBypass = async () => {
     try {
-      // 尝试用测试账号登录
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,53 +52,47 @@ export default function LoginPage() {
         return;
       }
 
-      // 如果测试账号不存在，注册一个
       const regResponse = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: '开发者',
+          name: '開発者',
           email: 'dev@kanaai.local',
           password: 'dev12345678',
         }),
       });
 
-      if (regResponse.ok) {
-        router.push('/dashboard');
-      }
+      if (regResponse.ok) router.push('/dashboard');
     } catch {
-      setError('开发模式登录失败');
+      setError('開発者ログインに失敗');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E1] pixel-grid flex items-center justify-center p-4">
+    <div className="min-h-screen relative z-10 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#FF1C1C] border-4 border-black mx-auto mb-4 flex items-center justify-center">
-            <span className="text-white text-2xl">あ</span>
+        <div className="mb-12 fade-up">
+          <Link href="/" className="inline-block">
+            <div className="flex items-baseline gap-2 mb-3">
+              <span className="font-display text-4xl font-medium tracking-tight">kana</span>
+              <span className="font-display text-4xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="h-[1px] w-8 bg-[var(--ink)] opacity-30"></span>
+            <span className="label-text">ログイン</span>
           </div>
-          <h1 className="text-lg text-[#2D2D2D]">kanaAI</h1>
-          <p className="text-[10px] text-[#666666] mt-2">登录后继续学习</p>
         </div>
 
-        {/* Login Form */}
-        <PixelCard variant="elevated">
-          <PixelDialog className="mb-6">
-            <p>欢迎回来！</p>
-            <p className="text-[#666666] text-[10px] mt-1">继续你的日语学习之旅吧</p>
-          </PixelDialog>
+        {/* Form */}
+        <div className="fade-up" style={{ animationDelay: '120ms' }}>
+          <h1 className="heading-lg mb-2">おかえりなさい</h1>
+          <p className="body-text opacity-70 mb-8">今日も日本語を学ぼう。</p>
 
-          {error && (
-            <div className="mb-4 p-3 bg-[#EF4444] text-white border-2 border-black text-[10px]">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <PixelInput
-              label="邮箱"
+              label="メール"
               type="email"
               placeholder="example@email.com"
               value={email}
@@ -109,7 +101,7 @@ export default function LoginPage() {
             />
 
             <PixelInput
-              label="密码"
+              label="パスワード"
               type="password"
               placeholder="••••••••"
               value={password}
@@ -117,54 +109,58 @@ export default function LoginPage() {
               required
             />
 
-            <div className="flex items-center justify-between text-[10px]">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="w-4 h-4 border-2 border-black" />
-                <span>记住登录状态</span>
+            <div className="flex items-center justify-between pt-2">
+              <label className="flex items-center gap-2 text-[0.75rem] font-mono opacity-60 cursor-pointer">
+                <input type="checkbox" className="w-3.5 h-3.5 border-[1.5px] border-[var(--ink)] accent-[var(--vermillion)]" />
+                <span className="uppercase tracking-wider">ログイン状態を保持</span>
               </label>
-              <a href="#" className="text-[#3B82F6] hover:underline">
-                忘记密码？
+              <a href="#" className="text-[0.75rem] font-mono opacity-50 hover:opacity-100 transition-opacity">
+                パスワードを忘れた?
               </a>
             </div>
 
-            <PixelButton
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? '登录中...' : '登录'}
+            {error && (
+              <div className="p-3 border-l-[3px] border-[var(--vermillion)] bg-[var(--vermillion)] bg-opacity-5 text-[0.8rem] font-body">
+                {error}
+              </div>
+            )}
+
+            <PixelButton type="submit" variant="primary" className="w-full" disabled={isLoading}>
+              {isLoading ? 'ログイン中…' : 'ログイン →'}
             </PixelButton>
           </form>
 
-          {/* 开发模式跳过登录 */}
-          <div className="mt-4 pt-4 border-t-2 border-dashed border-[#CCCCCC]">
-            <PixelButton
-              variant="ghost"
-              className="w-full"
+          {/* Dev bypass */}
+          <div className="mt-8 pt-6 border-t-[1px] border-[var(--ink)] border-opacity-15">
+            <button
               onClick={handleDevBypass}
+              className="w-full text-left p-4 border-[1.5px] border-dashed border-[var(--ink)] border-opacity-30 hover:border-opacity-80 transition-colors"
             >
-              🚀 开发模式 - 跳过登录
-            </PixelButton>
-            <p className="text-[10px] text-[#999999] text-center mt-2">
-              仅用于开发测试
-            </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>開発モード</div>
+                  <div className="font-display text-sm">開発者ログインをスキップ</div>
+                </div>
+                <span className="text-[1.2rem]">→</span>
+              </div>
+            </button>
           </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-[10px] text-[#666666]">
-              还没有账号？{' '}
-              <Link href="/register" className="text-[#3B82F6] hover:underline">
-                免费注册
+          {/* Register link */}
+          <div className="mt-8 text-center">
+            <p className="caption-text">
+              アカウントをお持ちでない方は{' '}
+              <Link href="/register" className="font-mono underline underline-offset-4 hover:opacity-70" style={{ color: 'var(--vermillion)' }}>
+                新規登録
               </Link>
             </p>
           </div>
-        </PixelCard>
+        </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link href="/" className="text-[10px] text-[#666666] hover:text-[#2D2D2D]">
-            ← 返回首页
-          </Link>
+        {/* Footer */}
+        <div className="mt-16 flex items-center justify-between caption-text">
+          <span>© 2026 kanaAI</span>
+          <Link href="/" className="hover:opacity-100 opacity-60">← ホーム</Link>
         </div>
       </div>
     </div>

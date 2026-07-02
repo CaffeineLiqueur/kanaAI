@@ -1,255 +1,466 @@
-/* JPLearning - Pokemon Pixel Theme */
+/* kanaAI - 和风 Riso 印刷主题 */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Antique:wght@400;500;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  /* Pokemon-inspired color palette */
-  --color-primary: #FF1C1C;
-  --color-primary-dark: #CC0000;
-  --color-primary-light: #FF6666;
-  --color-secondary: #3B82F6;
-  --color-secondary-dark: #2563EB;
-  --color-secondary-light: #60A5FA;
-  --color-accent: #FFD700;
-  --color-accent-dark: #FFA500;
-  --color-bg: #F5F0E1;
-  --color-bg-dark: #E8E0CC;
-  --color-text: #2D2D2D;
-  --color-text-light: #666666;
-  --color-success: #4ADE80;
-  --color-error: #EF4444;
+  /* 核心色板 */
+  --ink: #0F0F1A;
+  --ink-soft: #1A1A28;
+  --paper: #FAF7F2;
+  --paper-warm: #F0EBE0;
+  --paper-deep: #E5DFD0;
+  --vermillion: #C8102E;
+  --vermillion-dark: #9B0C24;
+  --cobalt: #1E3A8A;
+  --cobalt-dark: #152C6B;
+  --mustard: #D4A04A;
+  --mustard-dark: #A87C2E;
+  --sage: #5B7553;
 
-  /* Pixel font */
-  --font-pixel: 'Press Start 2P', cursive;
-
-  /* Pixel border width */
-  --border-pixel: 4px;
+  /* 字体 */
+  --font-display: 'Shippori Antique', serif;
+  --font-body: 'Klee One', cursive;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* Base pixel styles */
 * {
-  image-rendering: pixelated;
-  -webkit-font-smoothing: none;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-family: var(--font-pixel);
-  background-color: var(--color-bg);
-  color: var(--color-text);
+html, body {
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--ink);
+  font-feature-settings: "palt";
 }
 
-/* Pixel Button */
-.pixel-button {
-  font-family: var(--font-pixel);
-  font-size: 12px;
-  background: var(--color-primary);
-  color: white;
-  border: var(--border-pixel) solid #000;
-  box-shadow:
-    inset -4px -4px 0 0 var(--color-primary-dark),
-    inset 4px 4px 0 0 var(--color-primary-light),
-    8px 8px 0 0 rgba(0,0,0,0.3);
-  padding: 12px 24px;
-  cursor: pointer;
-  transition: transform 0.1s;
+::selection {
+  background: var(--vermillion);
+  color: var(--paper);
+}
+
+/* ===========================
+   全局排版
+   =========================== */
+
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+.font-mono { font-family: var(--font-mono); }
+
+.heading-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.heading-lg {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.heading-md {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+}
+
+.body-text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.label-text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.pixel-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow:
-    inset -4px -4px 0 0 var(--color-primary-dark),
-    inset 4px 4px 0 0 var(--color-primary-light),
-    10px 10px 0 0 rgba(0,0,0,0.3);
+.caption-text {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  opacity: 0.7;
 }
 
-.pixel-button:active {
+/* 竖排日文点缀 */
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+}
+
+/* ===========================
+   纸纹背景
+   =========================== */
+
+.paper-bg {
+  background-color: var(--paper);
+  position: relative;
+}
+
+.paper-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.06 0 0 0 0 0.10 0 0 0 0.04 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+.paper-bg::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at top right, rgba(200, 16, 46, 0.04), transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(30, 58, 138, 0.04), transparent 50%);
+}
+
+/* ===========================
+   Riso 套印错位效果
+   =========================== */
+
+.riso-shift-cyan {
+  text-shadow:
+    2px 0 0 rgba(30, 58, 138, 0.6),
+    -1px 0 0 rgba(200, 16, 46, 0.4);
+}
+
+.riso-shift-red {
+  text-shadow:
+    -2px 0 0 rgba(30, 58, 138, 0.4),
+    1px 0 0 rgba(212, 160, 74, 0.5);
+}
+
+/* 套印错位边框 */
+.riso-card {
+  position: relative;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.riso-card::before,
+.riso-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.riso-card::before {
+  border-color: rgba(200, 16, 46, 0.5);
   transform: translate(4px, 4px);
-  box-shadow:
-    inset -4px -4px 0 0 var(--color-primary-dark),
-    inset 4px 4px 0 0 var(--color-primary-light),
-    4px 4px 0 0 rgba(0,0,0,0.3);
 }
 
-.pixel-button--secondary {
-  background: var(--color-secondary);
-  box-shadow:
-    inset -4px -4px 0 0 var(--color-secondary-dark),
-    inset 4px 4px 0 0 var(--color-secondary-light),
-    8px 8px 0 0 rgba(0,0,0,0.3);
+.riso-card::after {
+  border-color: rgba(30, 58, 138, 0.5);
+  transform: translate(-3px, -3px);
 }
 
-.pixel-button--secondary:hover {
-  box-shadow:
-    inset -4px -4px 0 0 var(--color-secondary-dark),
-    inset 4px 4px 0 0 var(--color-secondary-light),
-    10px 10px 0 0 rgba(0,0,0,0.3);
+.riso-card:hover {
+  transform: translate(-2px, -2px);
 }
 
-.pixel-button--accent {
-  background: var(--color-accent);
-  color: var(--color-text);
-  box-shadow:
-    inset -4px -4px 0 0 var(--color-accent-dark),
-    inset 4px 4px 0 0 #FFE44D,
-    8px 8px 0 0 rgba(0,0,0,0.3);
+.riso-card:hover::before {
+  transform: translate(6px, 6px);
 }
 
-/* Pixel Card */
-.pixel-card {
-  background: var(--color-bg);
-  border: var(--border-pixel) solid #000;
-  box-shadow: 8px 8px 0 0 rgba(0,0,0,0.2);
-  padding: 16px;
+.riso-card:hover::after {
+  transform: translate(-5px, -5px);
 }
 
-.pixel-card--elevated {
-  box-shadow: 12px 12px 0 0 rgba(0,0,0,0.25);
+/* ===========================
+   半调网点
+   =========================== */
+
+.halftone-red {
+  background-image: radial-gradient(circle, var(--vermillion) 1.5px, transparent 1.5px);
+  background-size: 8px 8px;
 }
 
-/* Pixel Input */
-.pixel-input {
-  font-family: var(--font-pixel);
-  font-size: 12px;
-  background: white;
-  border: var(--border-pixel) solid #000;
-  box-shadow:
-    inset 4px 4px 0 0 rgba(0,0,0,0.1);
-  padding: 12px 16px;
-  outline: none;
+.halftone-cobalt {
+  background-image: radial-gradient(circle, var(--cobalt) 1.5px, transparent 1.5px);
+  background-size: 8px 8px;
 }
 
-.pixel-input:focus {
-  box-shadow:
-    inset 4px 4px 0 0 rgba(0,0,0,0.1),
-    0 0 0 4px var(--color-secondary);
+.halftone-mustard {
+  background-image: radial-gradient(circle, var(--mustard) 1.5px, transparent 1.5px);
+  background-size: 8px 8px;
 }
 
-/* Pixel Progress Bar */
-.pixel-progress {
-  height: 24px;
-  background: #2D2D2D;
-  border: 3px solid #000;
+.halftone-ink {
+  background-image: radial-gradient(circle, var(--ink) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+.halftone-mask {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><circle cx='3' cy='3' r='1' fill='%230F0F1A' opacity='0.6'/></svg>");
+  background-size: 6px 6px;
+}
+
+/* ===========================
+   数字与等宽
+   =========================== */
+
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* ===========================
+   进度条
+   =========================== */
+
+.progress-track {
+  position: relative;
+  height: 6px;
+  background: var(--paper-warm);
+  border: 1px solid var(--ink);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+}
+
+.progress-fill--vermillion { background: var(--vermillion); }
+.progress-fill--cobalt { background: var(--cobalt); }
+.progress-fill--mustard { background: var(--mustard); }
+
+/* ===========================
+   按钮
+   =========================== */
+
+.btn-primary {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1.5px solid var(--ink);
+  padding: 0.75rem 1.5rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
-.pixel-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark));
-  transition: width 0.3s ease;
+.btn-primary:hover {
+  background: var(--vermillion);
+  border-color: var(--vermillion);
 }
 
-.pixel-progress-fill--exp {
-  background: linear-gradient(90deg, #4ADE80, #22C55E);
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
-.pixel-progress-fill--hp {
-  background: linear-gradient(90deg, #EF4444, #DC2626);
+.btn-secondary {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  padding: 0.75rem 1.5rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Pixel Badge */
-.pixel-badge {
-  font-family: var(--font-pixel);
-  font-size: 10px;
+.btn-secondary:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-ghost {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  border-bottom: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+  border-bottom-color: var(--vermillion);
+  color: var(--vermillion);
+}
+
+/* ===========================
+   标签
+   =========================== */
+
+.tag {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  border: 3px solid #000;
-  box-shadow: 4px 4px 0 0 rgba(0,0,0,0.2);
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid currentColor;
+  background: transparent;
 }
 
-.pixel-badge--exp {
-  background: var(--color-accent);
-  color: var(--color-text);
+.tag-filled {
+  background: currentColor;
 }
 
-.pixel-badge--level {
-  background: var(--color-secondary);
-  color: white;
+.tag-filled > * {
+  color: var(--paper);
 }
 
-/* Pixel Dialog Box (Pokemon-style text box) */
-.pixel-dialog {
-  background: white;
-  border: var(--border-pixel) solid #000;
-  box-shadow:
-    inset -4px -4px 0 0 #CCCCCC,
-    inset 4px 4px 0 0 #FFFFFF,
-    8px 8px 0 0 rgba(0,0,0,0.3);
-  padding: 16px;
-  position: relative;
+.tag-vermillion { color: var(--vermillion); }
+.tag-cobalt { color: var(--cobalt); }
+.tag-mustard { color: var(--mustard-dark); }
+.tag-ink { color: var(--ink); }
+
+/* ===========================
+   输入框
+   =========================== */
+
+.input-field {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--ink);
+  padding: 0.75rem 0.25rem;
+  outline: none;
+  color: var(--ink);
+  width: 100%;
+  transition: border-color 0.2s;
 }
 
-.pixel-dialog::after {
-  content: '▼';
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  animation: bounce 1s infinite;
-  font-size: 12px;
+.input-field::placeholder {
+  color: var(--ink);
+  opacity: 0.4;
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+.input-field:focus {
+  border-bottom-color: var(--vermillion);
 }
 
-/* Pixel Sprite Animation */
-.pixel-sprite {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.input-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.6;
+  display: block;
+  margin-bottom: 0.25rem;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+/* ===========================
+   装饰元素
+   =========================== */
+
+.divider-line {
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.15;
 }
 
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-5deg); }
-  75% { transform: rotate(5deg); }
+.divider-thick {
+  height: 2px;
+  background: var(--ink);
 }
 
-.animate-float {
-  animation: float 2s ease-in-out infinite;
+.kanji-stamp {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--vermillion);
+  display: inline-block;
+  border: 3px double var(--vermillion);
+  padding: 0.5rem 0.75rem;
+  transform: rotate(-3deg);
+  opacity: 0.85;
 }
 
-.animate-wiggle {
-  animation: wiggle 0.5s ease-in-out;
+/* ===========================
+   动画
+   =========================== */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Pixel Grid Background */
-.pixel-grid {
-  background-image:
-    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-  background-size: 16px 16px;
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-/* Selection colors */
-::selection {
-  background: var(--color-primary);
-  color: white;
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-8px) rotate(0.5deg); }
 }
 
-/* Scrollbar styling */
+.drift {
+  animation: drift 6s ease-in-out infinite;
+}
+
+@keyframes ink-spread {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ink-spread {
+  animation: ink-spread 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ===========================
+   滚动条
+   =========================== */
+
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-dark);
-  border: 2px solid #000;
+  background: var(--paper-warm);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
-  border: 2px solid #000;
+  background: var(--ink);
+  opacity: 0.3;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-dark);
+  background: var(--vermillion);
 }

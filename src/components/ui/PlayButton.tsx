@@ -28,8 +28,8 @@ export default function PlayButton({
   };
 
   const sizes = {
-    sm: 'w-8 h-8 text-sm',
-    md: 'w-10 h-10 text-base',
+    sm: 'w-9 h-9 text-sm',
+    md: 'w-11 h-11 text-base',
   };
 
   return (
@@ -38,17 +38,19 @@ export default function PlayButton({
       disabled={isLoading || !settings.enabled}
       title={label || '音声を再生（播放语音）'}
       className={cn(
-        'border-2 border-black flex items-center justify-center transition-all duration-100',
-        'hover:bg-[#FFD700] active:translate-y-[1px]',
-        isPlaying ? 'bg-[#3B82F6] text-white animate-pulse' : 'bg-white',
+        'inline-flex items-center justify-center rounded-full border-[1.5px] transition-all duration-200',
+        'hover:bg-[var(--vermillion)] hover:border-[var(--vermillion)] hover:text-[var(--paper)]',
+        isPlaying ? 'bg-[var(--vermillion)] border-[var(--vermillion)] text-[var(--paper)]' : 'border-[var(--ink)] text-[var(--ink)]',
         isLoading ? 'opacity-50 cursor-wait' : '',
         !settings.enabled ? 'opacity-30 cursor-not-allowed' : '',
-        error ? 'bg-[#EF4444] text-white' : '',
+        error ? 'border-[var(--vermillion)] text-[var(--vermillion)]' : '',
         sizes[size],
         className
       )}
     >
-      {isLoading ? '⏳' : isPlaying ? '🔊' : '🔈'}
+      <span className="text-[0.9em]">
+        {isLoading ? '⏳' : isPlaying ? '🔊' : '▶'}
+      </span>
     </button>
   );
 }

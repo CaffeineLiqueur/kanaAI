@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 interface PixelProgressProps {
   value: number;
   max?: number;
-  variant?: 'default' | 'exp' | 'hp';
+  variant?: 'default' | 'exp' | 'hp' | 'vermillion' | 'cobalt' | 'mustard';
   showLabel?: boolean;
   label?: string;
   className?: string;
@@ -22,26 +22,27 @@ export default function PixelProgress({
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
   const fillVariants = {
-    default: 'bg-gradient-to-r from-[#FFD700] to-[#FFA500]',
-    exp: 'bg-gradient-to-r from-[#4ADE80] to-[#22C55E]',
-    hp: 'bg-gradient-to-r from-[#EF4444] to-[#DC2626]',
+    default: 'bg-[var(--ink)]',
+    exp: 'bg-[var(--sage)]',
+    hp: 'bg-[var(--vermillion)]',
+    vermillion: 'bg-[var(--vermillion)]',
+    cobalt: 'bg-[var(--cobalt)]',
+    mustard: 'bg-[var(--mustard)]',
   };
 
   return (
-    <div className={cn('flex flex-col gap-1', className)}>
+    <div className={cn('flex flex-col gap-1.5 w-full', className)}>
       {showLabel && (
-        <div className="flex justify-between items-center">
-          <span className="font-pixel text-[10px] text-[#2D2D2D]">
-            {label}
-          </span>
-          <span className="font-pixel text-[10px] text-[#666666]">
-            {value}/{max}
+        <div className="flex justify-between items-baseline">
+          <span className="label-text">{label}</span>
+          <span className="text-[0.7rem] font-mono tabular-nums text-[var(--ink-soft)]">
+            {value}<span className="opacity-40">/</span>{max}
           </span>
         </div>
       )}
-      <div className="pixel-progress">
+      <div className="progress-track">
         <div
-          className={cn('pixel-progress-fill', fillVariants[variant])}
+          className={cn('progress-fill', fillVariants[variant])}
           style={{ width: `${percentage}%` }}
         />
       </div>

@@ -4,24 +4,23 @@ import { HTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PixelCardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'outlined';
+  variant?: 'default' | 'elevated' | 'outlined' | 'plain';
   padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
 const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
   ({ className, variant = 'default', padding = 'md', children, ...props }, ref) => {
-    const baseStyles = 'bg-[#F5F0E1] border-4 border-black';
-
     const variants = {
-      default: 'shadow-[8px_8px_0_0_rgba(0,0,0,0.2)]',
-      elevated: 'shadow-[12px_12px_0_0_rgba(0,0,0,0.25)]',
-      outlined: 'shadow-none',
+      default: 'bg-[var(--paper)] border-[1.5px] border-[var(--ink)]',
+      elevated: 'bg-[var(--paper)] border-[1.5px] border-[var(--ink)] riso-card',
+      outlined: 'bg-transparent border-[1.5px] border-[var(--ink)]',
+      plain: 'bg-transparent',
     };
 
     const paddings = {
       none: 'p-0',
-      sm: 'p-3',
-      md: 'p-5',
+      sm: 'p-4',
+      md: 'p-6',
       lg: 'p-8',
     };
 
@@ -29,7 +28,7 @@ const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
       <div
         ref={ref}
         className={cn(
-          baseStyles,
+          'transition-all duration-300',
           variants[variant],
           paddings[padding],
           className

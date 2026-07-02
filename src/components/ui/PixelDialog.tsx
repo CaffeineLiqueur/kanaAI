@@ -16,16 +16,18 @@ export default function PixelDialog({
   return (
     <div
       className={cn(
-        'relative bg-white border-4 border-black p-5',
-        'shadow-[inset_-4px_-4px_0_0_#CCCCCC,inset_4px_4px_0_0_#FFFFFF,8px_8px_0_0_rgba(0,0,0,0.3)]',
+        'relative bg-[var(--paper)] border-[1.5px] border-[var(--ink)] p-5',
         className
       )}
     >
-      <div className="font-pixel text-xs text-[#2D2D2D] leading-relaxed">
+      <div className="font-body text-[0.95rem] text-[var(--ink)] leading-relaxed">
         {children}
       </div>
       {showArrow && (
-        <div className="absolute bottom-2 right-3 font-pixel text-xs text-[#666666] animate-bounce">
+        <div
+          className="absolute bottom-2.5 right-3 text-[0.8rem] drift"
+          style={{ color: 'var(--vermillion)' }}
+        >
           ▼
         </div>
       )}

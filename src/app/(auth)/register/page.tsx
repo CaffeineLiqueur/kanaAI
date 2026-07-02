@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelInput, PixelDialog } from '@/components/ui';
+import { PixelButton, PixelInput } from '@/components/ui';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function RegisterPage() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('两次输入的密码不一致');
+      setError('パスワードが一致しません');
       return;
     }
 
@@ -35,26 +35,25 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || '注册失败');
+        setError(data.error || '登録に失敗しました');
         return;
       }
 
       router.push('/dashboard');
     } catch {
-      setError('网络错误，请稍后重试');
+      setError('ネットワークエラー');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 开发模式：跳过注册
   const handleDevBypass = async () => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: '开发者',
+          name: '開発者',
           email: 'dev@kanaai.local',
           password: 'dev12345678',
         }),
@@ -65,58 +64,50 @@ export default function RegisterPage() {
         return;
       }
 
-      // 如果已注册，直接登录
       const loginResponse = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'dev@kanaai.local', password: 'dev12345678' }),
       });
 
-      if (loginResponse.ok) {
-        router.push('/dashboard');
-      }
+      if (loginResponse.ok) router.push('/dashboard');
     } catch {
-      setError('开发模式注册失败');
+      setError('開発者登録に失敗');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E1] pixel-grid flex items-center justify-center p-4">
+    <div className="min-h-screen relative z-10 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#FF1C1C] border-4 border-black mx-auto mb-4 flex items-center justify-center">
-            <span className="text-white text-2xl">あ</span>
+        <div className="mb-12 fade-up">
+          <Link href="/" className="inline-block">
+            <div className="flex items-baseline gap-2 mb-3">
+              <span className="font-display text-4xl font-medium tracking-tight">kana</span>
+              <span className="font-display text-4xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="h-[1px] w-8 bg-[var(--ink)] opacity-30"></span>
+            <span className="label-text">新規登録</span>
           </div>
-          <h1 className="text-lg text-[#2D2D2D]">kanaAI</h1>
-          <p className="text-[10px] text-[#666666] mt-2">创建账号，开始学习</p>
         </div>
 
-        {/* Register Form */}
-        <PixelCard variant="elevated">
-          <PixelDialog className="mb-6">
-            <p>你好！欢迎加入！</p>
-            <p className="text-[#666666] text-[10px] mt-1">一起开始日语学习之旅吧</p>
-          </PixelDialog>
+        <div className="fade-up" style={{ animationDelay: '120ms' }}>
+          <h1 className="heading-lg mb-2">はじめまして</h1>
+          <p className="body-text opacity-70 mb-8">アカウントを作成して、日本語学習を始めよう。</p>
 
-          {error && (
-            <div className="mb-4 p-3 bg-[#EF4444] text-white border-2 border-black text-[10px]">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <PixelInput
-              label="昵称"
+              label="ニックネーム"
               type="text"
-              placeholder="给自己起个名字吧"
+              placeholder="お名前"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
 
             <PixelInput
-              label="邮箱"
+              label="メール"
               type="email"
               placeholder="example@email.com"
               value={email}
@@ -125,9 +116,9 @@ export default function RegisterPage() {
             />
 
             <PixelInput
-              label="密码"
+              label="パスワード"
               type="password"
-              placeholder="至少8位字符"
+              placeholder="8 文字以上"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -135,63 +126,69 @@ export default function RegisterPage() {
             />
 
             <PixelInput
-              label="确认密码"
+              label="パスワード (確認)"
               type="password"
-              placeholder="再次输入密码"
+              placeholder="もう一度入力"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              error={!!confirmPassword && password !== confirmPassword ? '两次输入的密码不一致' : undefined}
+              error={!!confirmPassword && password !== confirmPassword ? 'パスワードが一致しません' : undefined}
             />
 
-            <div className="flex items-start gap-2 text-[10px]">
-              <input type="checkbox" className="w-4 h-4 border-2 border-black mt-1" required />
+            <label className="flex items-start gap-2 text-[0.75rem] font-body opacity-70 cursor-pointer">
+              <input type="checkbox" className="w-3.5 h-3.5 mt-0.5 border-[1.5px] border-[var(--ink)] accent-[var(--vermillion)]" required />
               <span>
-                我已阅读并同意{' '}
-                <a href="#" className="text-[#3B82F6] hover:underline">用户协议</a>
-                {' '}和{' '}
-                <a href="#" className="text-[#3B82F6] hover:underline">隐私政策</a>
+                <Link href="#" className="underline underline-offset-2">利用規約</Link>
+                {' '}と{' '}
+                <Link href="#" className="underline underline-offset-2">プライバシーポリシー</Link>
+                {' '}に同意します
               </span>
-            </div>
+            </label>
+
+            {error && (
+              <div className="p-3 border-l-[3px] border-[var(--vermillion)] bg-[var(--vermillion)] bg-opacity-5 text-[0.8rem] font-body">
+                {error}
+              </div>
+            )}
 
             <PixelButton
               type="submit"
+              variant="primary"
               className="w-full"
               disabled={isLoading || (!!confirmPassword && password !== confirmPassword)}
             >
-              {isLoading ? '注册中...' : '免费注册'}
+              {isLoading ? '登録中…' : '登録する →'}
             </PixelButton>
           </form>
 
-          {/* 开发模式跳过注册 */}
-          <div className="mt-4 pt-4 border-t-2 border-dashed border-[#CCCCCC]">
-            <PixelButton
-              variant="ghost"
-              className="w-full"
+          <div className="mt-8 pt-6 border-t-[1px] border-[var(--ink)] border-opacity-15">
+            <button
               onClick={handleDevBypass}
+              className="w-full text-left p-4 border-[1.5px] border-dashed border-[var(--ink)] border-opacity-30 hover:border-opacity-80 transition-colors"
             >
-              🚀 开发模式 - 跳过注册
-            </PixelButton>
-            <p className="text-[10px] text-[#999999] text-center mt-2">
-              仅用于开发测试
-            </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>開発モード</div>
+                  <div className="font-display text-sm">開発者として登録をスキップ</div>
+                </div>
+                <span className="text-[1.2rem]">→</span>
+              </div>
+            </button>
           </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-[10px] text-[#666666]">
-              已有账号？{' '}
-              <Link href="/login" className="text-[#3B82F6] hover:underline">
-                立即登录
+          <div className="mt-8 text-center">
+            <p className="caption-text">
+              すでにアカウントをお持ちですか?{' '}
+              <Link href="/login" className="font-mono underline underline-offset-4 hover:opacity-70" style={{ color: 'var(--vermillion)' }}>
+                ログイン
               </Link>
             </p>
           </div>
-        </PixelCard>
+        </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link href="/" className="text-[10px] text-[#666666] hover:text-[#2D2D2D]">
-            ← 返回首页
-          </Link>
+        <div className="mt-12 flex items-center justify-between caption-text">
+          <span>© 2026 kanaAI</span>
+          <Link href="/" className="hover:opacity-100 opacity-60">← ホーム</Link>
         </div>
       </div>
     </div>

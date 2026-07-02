@@ -3,8 +3,9 @@
 import { cn } from '@/lib/utils';
 
 interface PixelBadgeProps {
-  variant?: 'default' | 'exp' | 'level' | 'success' | 'error';
+  variant?: 'default' | 'exp' | 'level' | 'success' | 'error' | 'vermillion' | 'cobalt' | 'mustard' | 'ink';
   size?: 'sm' | 'md';
+  filled?: boolean;
   children: React.ReactNode;
   className?: string;
 }
@@ -12,34 +13,44 @@ interface PixelBadgeProps {
 export default function PixelBadge({
   variant = 'default',
   size = 'sm',
+  filled = false,
   children,
   className,
 }: PixelBadgeProps) {
-  const baseStyles = 'font-pixel inline-flex items-center border-3 border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]';
-
-  const variants = {
-    default: 'bg-[#F5F0E1] text-[#2D2D2D]',
-    exp: 'bg-[#FFD700] text-[#2D2D2D]',
-    level: 'bg-[#3B82F6] text-white',
-    success: 'bg-[#4ADE80] text-[#2D2D2D]',
-    error: 'bg-[#EF4444] text-white',
+  const colorMap = {
+    default: 'var(--ink)',
+    exp: 'var(--sage)',
+    level: 'var(--cobalt)',
+    success: 'var(--sage)',
+    error: 'var(--vermillion)',
+    vermillion: 'var(--vermillion)',
+    cobalt: 'var(--cobalt)',
+    mustard: 'var(--mustard-dark)',
+    ink: 'var(--ink)',
   };
 
   const sizes = {
-    sm: 'text-[10px] px-2 py-1',
-    md: 'text-xs px-3 py-1.5',
+    sm: 'text-[0.6rem] px-2 py-0.5',
+    md: 'text-[0.7rem] px-2.5 py-1',
   };
 
   return (
     <span
       className={cn(
-        baseStyles,
-        variants[variant],
+        'inline-flex items-center gap-1.5 font-mono font-medium tracking-wider uppercase',
+        'border transition-colors',
         sizes[size],
         className
       )}
+      style={{
+        color: colorMap[variant],
+        borderColor: colorMap[variant],
+        backgroundColor: filled ? colorMap[variant] : 'transparent',
+      }}
     >
-      {children}
+      <span style={{ color: filled ? 'var(--paper)' : colorMap[variant] }}>
+        {children}
+      </span>
     </span>
   );
 }

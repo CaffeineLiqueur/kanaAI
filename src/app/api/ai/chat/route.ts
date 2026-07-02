@@ -4,15 +4,17 @@ import { aiConfig } from '@/lib/ai/config';
 // 动态导入AI SDK
 async function getAIModel(provider: string) {
   if (provider === 'anthropic') {
-    const { anthropic } = await import('@ai-sdk/anthropic');
-    return anthropic(aiConfig.anthropic.model, {
+    const { createAnthropic } = await import('@ai-sdk/anthropic');
+    const anthropic = createAnthropic({
       baseURL: aiConfig.anthropic.baseURL,
     });
+    return anthropic(aiConfig.anthropic.model);
   } else {
-    const { openai } = await import('@ai-sdk/openai');
-    return openai(aiConfig.openai.model, {
+    const { createOpenAI } = await import('@ai-sdk/openai');
+    const openai = createOpenAI({
       baseURL: aiConfig.openai.baseURL,
     });
+    return openai(aiConfig.openai.model);
   }
 }
 

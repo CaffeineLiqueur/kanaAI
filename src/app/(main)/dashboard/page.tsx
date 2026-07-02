@@ -40,7 +40,6 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        // Fetch user
         const userRes = await fetch('/api/auth/me');
         if (!userRes.ok) {
           router.push('/login');
@@ -49,14 +48,12 @@ export default function DashboardPage() {
         const userData = await userRes.json();
         setUser(userData.user);
 
-        // Fetch pet
         const petRes = await fetch('/api/pet');
         if (petRes.ok) {
           const petData = await petRes.json();
           setPet(petData.pet);
         }
 
-        // Fetch progress
         const progressRes = await fetch('/api/progress');
         if (progressRes.ok) {
           const progressData = await progressRes.json();
@@ -68,7 +65,6 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-
     loadData();
   }, [router]);
 
@@ -79,13 +75,12 @@ export default function DashboardPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#F5F0E1] pixel-grid flex items-center justify-center">
-        <div className="text-xs text-[#666666]">加载中...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="label-text">読み込み中…</div>
       </div>
     );
   }
 
-  // Calculate progress stats
   const kanaProgress = progress.filter(p => p.module === 'kana');
   const kanaMastered = kanaProgress.filter(p => p.mastered).length;
   const vocabProgress = progress.filter(p => p.module === 'vocabulary');
@@ -95,261 +90,254 @@ export default function DashboardPage() {
 
   const totalMastered = kanaMastered + vocabMastered + grammarMastered;
   const userLevel = Math.max(1, Math.floor(totalMastered / 10) + 1);
+  const expToNext = getExpForLevel(userLevel);
   const userExp = (totalMastered % 10) * 50;
-  const expToNext = 500;
 
   return (
-    <div className="min-h-screen bg-[#F5F0E1] pixel-grid">
+    <div className="min-h-screen relative z-10">
       {/* Header */}
-      <header className="border-b-4 border-black bg-white shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#FF1C1C] border-3 border-black flex items-center justify-center">
-              <span className="text-white text-lg">あ</span>
-            </div>
-            <h1 className="text-sm text-[#2D2D2D]">kanaAI</h1>
-          </div>
+      <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-baseline gap-2">
+            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
+            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
+          </Link>
           <div className="flex items-center gap-4">
-            <PixelBadge variant="level">Lv.{userLevel}</PixelBadge>
+            <PixelBadge variant="ink" filled>LV. {String(userLevel).padStart(2, '0')}</PixelBadge>
             <div className="flex items-center gap-2">
-              <span className="text-[10px]">{user.name}</span>
+              <span className="text-[0.85rem] font-body">{user.name}</span>
               <button
                 onClick={handleLogout}
-                className="w-10 h-10 bg-[#FFD700] border-3 border-black rounded-full flex items-center justify-center hover:bg-[#FFC800]"
+                className="w-9 h-9 rounded-full border-[1.5px] border-[var(--ink)] flex items-center justify-center hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors"
+                title="ログアウト"
               >
-                <span className="text-sm">👤</span>
+                <span className="text-[0.85rem]">↗</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* Welcome Message */}
-        <div className="mb-8">
-          <PixelCard>
-            <p className="text-xs">欢迎回来，{user.name}！</p>
-            <p className="text-[#666666] text-[10px] mt-2">
-              今天也来学习日语吧，你的宠物在等你哦！
-            </p>
-          </PixelCard>
-        </div>
+      <main className="max-w-5xl mx-auto px-6 py-12">
+        {/* Greeting */}
+        <section className="mb-12 fade-up">
+          <div className="label-text mb-2">本日 — TODAY</div>
+          <h1 className="heading-lg mb-2">
+            こんにちは、<span style={{ color: 'var(--vermillion)' }}>{user.name}</span>さん
+          </h1>
+          <p className="body-text opacity-70">今日も相棒と一緒に、日本語を学びましょう。</p>
+        </section>
 
-        {/* User Stats & Pet Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* User Stats */}
-          <PixelCard>
-            <h2 className="text-xs mb-4">学习状态</h2>
-            <div className="flex flex-col gap-3">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px]">等级</span>
-                  <span className="text-[10px]">{userLevel}</span>
-                </div>
-                <PixelProgress
-                  value={userExp}
-                  max={expToNext}
-                  variant="exp"
-                />
-                <div className="text-[10px] text-right mt-1 text-[#666666]">
-                  {userExp}/{expToNext} EXP
-                </div>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-[#FFD700] border-2 border-black">
-                <span className="text-[10px]">已掌握</span>
-                <span className="text-xs font-bold">{totalMastered} 项</span>
-              </div>
+        {/* Main grid: User stats + Pet */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+          {/* User stats */}
+          <div className="lg:col-span-5 fade-up" style={{ animationDelay: '100ms' }}>
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="label-text">学習状況</h2>
+              <span className="caption-text">STATS</span>
             </div>
-          </PixelCard>
+            <PixelCard>
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-baseline justify-between mb-3">
+                    <span className="font-display text-[0.8rem] opacity-60">EXPERIENCE</span>
+                    <span className="font-mono text-[0.85rem] tabular-nums">
+                      {userExp}<span className="opacity-40"> / </span>{expToNext}
+                    </span>
+                  </div>
+                  <PixelProgress value={userExp} max={expToNext} variant="vermillion" />
+                </div>
 
-          {/* Pet Card */}
-          <PixelCard className="lg:col-span-2">
+                <div className="divider-line"></div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <div className="label-text" style={{ color: 'var(--vermillion)' }}>仮名</div>
+                    <div className="font-display text-2xl tabular-nums">{kanaMastered}</div>
+                  </div>
+                  <div>
+                    <div className="label-text" style={{ color: 'var(--cobalt)' }}>語彙</div>
+                    <div className="font-display text-2xl tabular-nums">{vocabMastered}</div>
+                  </div>
+                  <div>
+                    <div className="label-text" style={{ color: 'var(--mustard-dark)' }}>文法</div>
+                    <div className="font-display text-2xl tabular-nums">{grammarMastered}</div>
+                  </div>
+                </div>
+              </div>
+            </PixelCard>
+          </div>
+
+          {/* Pet */}
+          <div className="lg:col-span-7 fade-up" style={{ animationDelay: '180ms' }}>
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="label-text">相棒</h2>
+              <Link href="/pet" className="caption-text hover:opacity-100">詳細 →</Link>
+            </div>
             {pet ? (
-              <div className="flex items-center gap-6">
-                {/* Pet Sprite */}
-                <div className="w-32 h-32 bg-[#FFD700] border-4 border-black flex items-center justify-center shrink-0">
-                  <span className="text-6xl">
-                    {pet.species === 'dog' ? '🐕' : pet.species === 'cat' ? '🐱' : '🐰'}
-                  </span>
-                </div>
+              <PixelCard className="relative overflow-hidden">
+                <div className="absolute top-4 right-4 halftone-ink w-20 h-20 opacity-20"></div>
 
-                {/* Pet Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-sm">{pet.name}</h3>
-                    <PixelBadge variant="level">Lv.{pet.level}</PixelBadge>
+                <div className="flex items-center gap-6 relative">
+                  <div className="shrink-0 w-28 h-28 border-[1.5px] border-[var(--ink)] flex items-center justify-center bg-[var(--paper-warm)]">
+                    <span className="text-6xl drift">
+                      {pet.species === 'dog' ? '🐕' : pet.species === 'cat' ? '🐱' : '🐰'}
+                    </span>
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <h3 className="font-display text-2xl font-medium">{pet.name}</h3>
+                      <span className="label-text">Lv. {pet.level}</span>
+                    </div>
+                    <div className="caption-text mb-4">
+                      Stage {pet.evolution} · {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫' : '兎'}
+                    </div>
 
-                  <div className="flex flex-col gap-2 mb-4">
-                    <PixelProgress
-                      value={pet.exp}
-                      max={getExpForLevel(pet.level)}
-                      label="经验"
-                      variant="exp"
-                      showLabel
-                    />
-                    <PixelProgress
-                      value={pet.happiness}
-                      label="心情"
-                      variant="default"
-                      showLabel
-                    />
-                    <PixelProgress
-                      value={100 - pet.hunger}
-                      label="饱腹"
-                      showLabel
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Link href="/pet">
-                      <PixelButton size="sm" variant="accent">
-                        查看宠物
-                      </PixelButton>
-                    </Link>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between items-baseline mb-1.5">
+                          <span className="label-text" style={{ color: 'var(--cobalt)' }}>経験値</span>
+                          <span className="text-[0.7rem] font-mono tabular-nums opacity-60">
+                            {pet.exp} <span className="opacity-50">/</span> {getExpForLevel(pet.level)}
+                          </span>
+                        </div>
+                        <PixelProgress value={pet.exp} max={getExpForLevel(pet.level)} variant="cobalt" />
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-baseline mb-1.5">
+                          <span className="label-text" style={{ color: 'var(--vermillion)' }}>幸福度</span>
+                          <span className="text-[0.7rem] font-mono tabular-nums opacity-60">{pet.happiness}%</span>
+                        </div>
+                        <PixelProgress value={pet.happiness} max={100} variant="vermillion" />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </PixelCard>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-[10px] text-[#666666]">加载宠物信息中...</p>
-              </div>
+              <PixelCard>
+                <p className="caption-text">相棒を読み込み中…</p>
+              </PixelCard>
             )}
-          </PixelCard>
-        </div>
+          </div>
+        </section>
 
-        {/* Learning Modules Grid */}
-        <h2 className="text-xs mb-4">学习模块</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Kana Module */}
-          <Link href="/kana">
-            <PixelCard className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform cursor-pointer h-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-[#FFD700] border-3 border-black flex items-center justify-center">
-                  <span className="text-lg">あ</span>
-                </div>
-                <div>
-                  <h3 className="text-xs">假名学习</h3>
-                  <p className="text-[10px] text-[#666666]">平假名 · 片假名</p>
-                </div>
-              </div>
-              <PixelProgress
-                value={kanaMastered}
-                max={46}
-                label="进度"
-                showLabel
-              />
-            </PixelCard>
-          </Link>
+        {/* Modules section title */}
+        <section className="mb-6">
+          <div className="flex items-baseline justify-between mb-2">
+            <h2 className="heading-md">学習を続ける</h2>
+            <span className="label-text opacity-50">— MODULES</span>
+          </div>
+          <div className="divider-thick"></div>
+        </section>
 
-          {/* Vocabulary Module */}
-          <Link href="/vocabulary">
-            <PixelCard className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform cursor-pointer h-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-[#4ADE80] border-3 border-black flex items-center justify-center">
-                  <span className="text-lg">📖</span>
+        {/* Modules grid */}
+        <section className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <Link href="/kana" className="fade-up" style={{ animationDelay: '240ms' }}>
+            <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-display text-3xl" style={{ color: 'var(--vermillion)' }}>あ</span>
+                  <span className="label-text opacity-50">01</span>
                 </div>
-                <div>
-                  <h3 className="text-xs">单词本</h3>
-                  <p className="text-[10px] text-[#666666]">基础词汇</p>
+                <h3 className="font-display text-base font-medium mb-1">仮名</h3>
+                <p className="caption-text mb-3">平仮名 · 片仮名</p>
+                <div className="mt-auto">
+                  <PixelProgress value={kanaMastered} max={46} variant="vermillion" showLabel label="進捗" />
                 </div>
-              </div>
-              <PixelProgress
-                value={vocabMastered}
-                max={11}
-                label="进度"
-                variant="exp"
-                showLabel
-              />
-            </PixelCard>
-          </Link>
-
-          {/* Grammar Module */}
-          <Link href="/grammar">
-            <PixelCard className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform cursor-pointer h-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-[#3B82F6] border-3 border-black flex items-center justify-center">
-                  <span className="text-lg">📝</span>
-                </div>
-                <div>
-                  <h3 className="text-xs">语法入门</h3>
-                  <p className="text-[10px] text-[#666666]">基础语法</p>
-                </div>
-              </div>
-              <PixelProgress
-                value={grammarMastered}
-                max={5}
-                label="进度"
-                variant="default"
-                showLabel
-              />
-            </PixelCard>
-          </Link>
-
-          {/* AI Chat Module */}
-          <Link href="/practice">
-            <PixelCard className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform cursor-pointer h-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-[#A78BFA] border-3 border-black flex items-center justify-center">
-                  <span className="text-lg">💬</span>
-                </div>
-                <div>
-                  <h3 className="text-xs">AI 对话练习</h3>
-                  <p className="text-[10px] text-[#666666]">场景对话</p>
-                </div>
-              </div>
-              <div className="text-[10px] text-[#666666]">
-                6个场景可供练习
               </div>
             </PixelCard>
           </Link>
 
-          {/* Quiz Module */}
-          <Link href="/quiz">
-            <PixelCard className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform cursor-pointer h-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-[#F59E0B] border-3 border-black flex items-center justify-center">
-                  <span className="text-lg">✨</span>
+          <Link href="/vocabulary" className="fade-up" style={{ animationDelay: '300ms' }}>
+            <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-display text-3xl" style={{ color: 'var(--cobalt)' }}>言</span>
+                  <span className="label-text opacity-50">02</span>
                 </div>
-                <div>
-                  <h3 className="text-xs">智能测验</h3>
-                  <p className="text-[10px] text-[#666666]">AI 出题</p>
+                <h3 className="font-display text-base font-medium mb-1">語彙</h3>
+                <p className="caption-text mb-3">単語 · Vocabulary</p>
+                <div className="mt-auto">
+                  <PixelProgress value={vocabMastered} max={11} variant="cobalt" showLabel label="進捗" />
                 </div>
-              </div>
-              <div className="text-[10px] text-[#666666]">
-                测试你的日语水平
               </div>
             </PixelCard>
           </Link>
 
-          {/* Pet Module */}
-          <Link href="/pet">
-            <PixelCard className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform cursor-pointer h-full">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-[#EC4899] border-3 border-black flex items-center justify-center">
-                  <span className="text-lg">🐾</span>
+          <Link href="/grammar" className="fade-up" style={{ animationDelay: '360ms' }}>
+            <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-display text-3xl" style={{ color: 'var(--mustard-dark)' }}>文</span>
+                  <span className="label-text opacity-50">03</span>
                 </div>
-                <div>
-                  <h3 className="text-xs">我的宠物</h3>
-                  <p className="text-[10px] text-[#666666]">培养伙伴</p>
+                <h3 className="font-display text-base font-medium mb-1">文法</h3>
+                <p className="caption-text mb-3">基礎 · Grammar</p>
+                <div className="mt-auto">
+                  <PixelProgress value={grammarMastered} max={5} variant="mustard" showLabel label="進捗" />
                 </div>
-              </div>
-              <div className="text-[10px] text-[#666666]">
-                {pet ? `${pet.name} - Lv.${pet.level}` : '加载中...'}
               </div>
             </PixelCard>
           </Link>
-        </div>
+
+          <Link href="/practice" className="fade-up" style={{ animationDelay: '420ms' }}>
+            <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-display text-3xl" style={{ color: 'var(--sage)' }}>話</span>
+                  <span className="label-text opacity-50">04</span>
+                </div>
+                <h3 className="font-display text-base font-medium mb-1">AI 会話</h3>
+                <p className="caption-text mb-3">実践 · Practice</p>
+                <p className="caption-text mt-auto opacity-50">6 シーン</p>
+              </div>
+            </PixelCard>
+          </Link>
+
+          <Link href="/quiz" className="fade-up" style={{ animationDelay: '480ms' }}>
+            <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-display text-3xl" style={{ color: 'var(--ink)' }}>試</span>
+                  <span className="label-text opacity-50">05</span>
+                </div>
+                <h3 className="font-display text-base font-medium mb-1">試験</h3>
+                <p className="caption-text mb-3">確認 · Quiz</p>
+                <p className="caption-text mt-auto opacity-50">総合テスト</p>
+              </div>
+            </PixelCard>
+          </Link>
+
+          <Link href="/pet" className="fade-up" style={{ animationDelay: '540ms' }}>
+            <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-display text-3xl" style={{ color: 'var(--vermillion)' }}>
+                    {pet ? (pet.species === 'dog' ? '犬' : pet.species === 'cat' ? '猫' : '兎') : '宝'}
+                  </span>
+                  <span className="label-text opacity-50">06</span>
+                </div>
+                <h3 className="font-display text-base font-medium mb-1">相棒</h3>
+                <p className="caption-text mb-3">ペット · Pet</p>
+                <p className="caption-text mt-auto opacity-50">
+                  {pet ? `${pet.name} · Lv.${pet.level}` : '—'}
+                </p>
+              </div>
+            </PixelCard>
+          </Link>
+        </section>
+
+        {/* Footer */}
+        <footer className="mt-20 pt-6 border-t-[1.5px] border-[var(--ink)] flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+          <div className="flex items-center gap-3">
+            <span className="font-display text-sm">kanaAI</span>
+            <span className="h-[12px] w-[1.5px] bg-[var(--ink)] opacity-30"></span>
+            <span className="caption-text">© 2026</span>
+          </div>
+          <div className="caption-text opacity-50">東京 — 日本語</div>
+        </footer>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t-4 border-black bg-white mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-4 text-center">
-          <p className="text-[10px] text-[#666666]">
-            © 2026 kanaAI - 每天进步一点点！
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
