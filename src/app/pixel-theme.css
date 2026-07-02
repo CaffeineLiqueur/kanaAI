@@ -31,7 +31,7 @@
 }
 
 html, body {
-  font-family: var(--font-display);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-weight: 400;
   background-color: var(--paper);
   color: var(--ink);
@@ -76,9 +76,9 @@ html, body {
   line-height: 1.3;
 }
 
-/* 正文：使用 Shippori Antique（支持 400/500），保证粗细一致 */
+/* 正文：以中文为主，优先 Noto Sans SC，避免中日字体混排 */
 .body-text {
-  font-family: var(--font-display);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.75;
@@ -93,7 +93,7 @@ html, body {
 }
 
 .caption-text {
-  font-family: var(--font-display);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-weight: 400;
   font-size: 0.8rem;
   line-height: 1.5;
@@ -359,7 +359,7 @@ html, body {
    =========================== */
 
 .input-field {
-  font-family: var(--font-display);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-weight: 400;
   font-size: 1rem;
   background: transparent;

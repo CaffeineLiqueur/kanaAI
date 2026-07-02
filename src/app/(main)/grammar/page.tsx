@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge, PlayButton } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge, PlayButton, Logo } from '@/components/ui';
 
 const grammarData = [
   {
@@ -123,10 +123,7 @@ export default function GrammarPage() {
     <div className="min-h-screen relative z-10">
       <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-baseline gap-2">
-            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
-            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
-          </Link>
+          <Logo />
           <Link href="/dashboard">
             <PixelButton variant="ghost" size="sm">← 戻る</PixelButton>
           </Link>

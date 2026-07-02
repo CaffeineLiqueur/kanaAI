@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelBadge, PlayButton, SpeakerSelector } from '@/components/ui';
+import { PixelButton, PixelBadge, PlayButton, SpeakerSelector, Logo } from '@/components/ui';
 import { useTTS } from '@/lib/tts/useTTS';
 import { useTTSSettings } from '@/lib/tts/TTSContext';
 
@@ -147,10 +147,7 @@ export default function PracticePage() {
     <div className="min-h-screen relative z-10">
       <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-baseline gap-2">
-            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
-            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
-          </Link>
+          <Logo />
           <div className="flex items-center gap-3">
             <SpeakerSelector />
             <Link href="/dashboard">

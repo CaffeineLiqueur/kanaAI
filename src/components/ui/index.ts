@@ -6,3 +6,4 @@ export { default as PixelBadge } from './PixelBadge';
 export { default as PixelDialog } from './PixelDialog';
 export { default as PlayButton } from './PlayButton';
 export { default as SpeakerSelector } from './SpeakerSelector';
+export { default as Logo } from './Logo';

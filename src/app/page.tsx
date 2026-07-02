@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, Logo } from '@/components/ui';
 
 interface User {
   id: string;
@@ -134,10 +134,7 @@ export default function Home() {
       {/* Header */}
       <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-baseline gap-2">
-            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
-            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
-          </Link>
+          <Logo />
           <nav className="flex items-center gap-4">
             {user ? (
               <>
@@ -203,10 +200,10 @@ export default function Home() {
               )}
             </div>
 
-            {/* Pet / Stamp decoration */}
-            <div className="md:col-span-4 relative h-32 md:h-40">
+            {/* Pet / Logo decoration */}
+            <div className="md:col-span-4 relative h-32 md:h-40 flex items-center justify-end">
               {pet ? (
-                <div className="absolute inset-0 flex flex-col items-end justify-end">
+                <div className="flex flex-col items-end">
                   <div className="text-right">
                     <div className="label-text mb-1 opacity-50">今日伙伴</div>
                     <div className="font-display text-3xl">{pet.name}</div>
@@ -214,9 +211,7 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-end">
-                  <div className="kanji-stamp drift">学</div>
-                </div>
+                <Logo size="2xl" variant="mark" href="" className="drift" />
               )}
             </div>
           </div>

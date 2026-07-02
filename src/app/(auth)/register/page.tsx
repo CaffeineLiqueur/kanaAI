@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PixelButton, PixelInput } from '@/components/ui';
+import { PixelButton, PixelInput, Logo } from '@/components/ui';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -81,10 +81,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="mb-12 fade-up">
           <Link href="/" className="inline-block">
-            <div className="flex items-baseline gap-2 mb-3">
-              <span className="font-display text-4xl font-medium tracking-tight">kana</span>
-              <span className="font-display text-4xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
-            </div>
+            <Logo size="lg" variant="wordmark" href="" className="mb-3" />
           </Link>
           <div className="flex items-center gap-3">
             <span className="h-[1px] w-8 bg-[var(--ink)] opacity-30"></span>

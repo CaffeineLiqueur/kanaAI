@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, PixelBadge } from '@/components/ui';
+import { PixelButton, PixelCard, PixelProgress, PixelBadge, Logo } from '@/components/ui';
 import { getExpForLevel } from '@/lib/utils';
 
 interface User {
@@ -98,10 +98,7 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-baseline gap-2">
-            <span className="font-display text-2xl font-medium tracking-tight">kana</span>
-            <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
-          </Link>
+          <Logo />
           <div className="flex items-center gap-4">
             <PixelBadge variant="ink" filled>Lv. {String(userLevel).padStart(2, '0')}</PixelBadge>
             <div className="flex items-center gap-2">
