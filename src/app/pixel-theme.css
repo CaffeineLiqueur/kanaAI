@@ -1,6 +1,7 @@
 /* kanaAI - 和风 Riso 印刷主题 */
 
-@import url('https://fonts.googleapis.com/css2?family=Shippori+Antique:wght@400;500;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* 字体堆叠：中文 → Noto Sans SC，日文 → Shippori Antique，浏览器按字符自动选字体 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Shippori+Antique:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
   /* 核心色板 */
@@ -17,10 +18,11 @@
   --mustard-dark: #A87C2E;
   --sage: #5B7553;
 
-  /* 字体 */
-  --font-display: 'Shippori Antique', serif;
-  --font-body: 'Klee One', cursive;
+  /* 字体：堆叠中英文，中文用 Noto Sans SC，日文用 Shippori Antique */
+  --font-display: 'Shippori Antique', 'Noto Sans SC', serif;
+  --font-body: 'Noto Sans SC', 'Shippori Antique', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-handwritten: 'Klee One', cursive;
 }
 
 * {
@@ -29,7 +31,8 @@
 }
 
 html, body {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
+  font-weight: 400;
   background-color: var(--paper);
   color: var(--ink);
   font-feature-settings: "palt";
@@ -45,8 +48,9 @@ html, body {
    =========================== */
 
 .font-display { font-family: var(--font-display); }
-.font-body { font-family: var(--font-body); }
+.font-body { font-family: var(--font-display); }
 .font-mono { font-family: var(--font-mono); }
+.font-handwritten { font-family: var(--font-body); }
 
 .heading-xl {
   font-family: var(--font-display);
@@ -72,8 +76,10 @@ html, body {
   line-height: 1.3;
 }
 
+/* 正文：使用 Shippori Antique（支持 400/500），保证粗细一致 */
 .body-text {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.75;
 }
@@ -87,11 +93,12 @@ html, body {
 }
 
 .caption-text {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 0.8rem;
   line-height: 1.5;
   color: var(--ink-soft);
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 /* 竖排日文点缀 */
@@ -352,7 +359,8 @@ html, body {
    =========================== */
 
 .input-field {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 1rem;
   background: transparent;
   border: none;

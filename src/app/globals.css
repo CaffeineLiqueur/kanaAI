@@ -15,8 +15,9 @@
   --color-mustard-dark: #A87C2E;
   --color-sage: #5B7553;
 
-  /* 字体 */
-  --font-display: 'Shippori Antique', serif;
-  --font-body: 'Klee One', cursive;
+  /* 字体：堆叠中英文 */
+  --font-display: 'Shippori Antique', 'Noto Sans SC', serif;
+  --font-body: 'Noto Sans SC', 'Shippori Antique', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-handwritten: 'Klee One', cursive;
 }
