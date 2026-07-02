@@ -68,59 +68,53 @@ export default function Home() {
     {
       href: '/kana',
       icon: 'あ',
-      jpTitle: '仮名',
-      title: '假名',
-      subtitle: 'Hiragana · Katakana',
+      title: '假名学习',
+      subtitle: '五十音图',
       color: 'var(--vermillion)',
       progress: kanaMastered,
       total: 46,
     },
     {
       href: '/vocabulary',
-      icon: '言',
-      jpTitle: '語彙',
+      icon: '📖',
       title: '词汇',
-      subtitle: 'Vocabulary',
+      subtitle: '基础单词',
       color: 'var(--cobalt)',
       progress: vocabMastered,
       total: 11,
     },
     {
       href: '/grammar',
-      icon: '文',
-      jpTitle: '文法',
+      icon: '📝',
       title: '语法',
-      subtitle: 'Grammar',
+      subtitle: '入门语法',
       color: 'var(--mustard-dark)',
       progress: grammarMastered,
       total: 5,
     },
     {
       href: '/practice',
-      icon: '話',
-      jpTitle: '会話',
+      icon: '💬',
       title: 'AI 对话',
-      subtitle: 'AI Practice',
+      subtitle: '场景练习',
       color: 'var(--sage)',
       progress: null,
       total: null,
     },
     {
       href: '/quiz',
-      icon: '試',
-      jpTitle: '試験',
+      icon: '✨',
       title: '测验',
-      subtitle: 'Quiz',
+      subtitle: '巩固所学',
       color: 'var(--ink)',
       progress: null,
       total: null,
     },
     {
       href: '/pet',
-      icon: pet ? (pet.species === 'dog' ? '犬' : pet.species === 'cat' ? '猫' : '兎') : '宝',
-      jpTitle: '相棒',
+      icon: '🐾',
       title: '我的宠物',
-      subtitle: pet ? `${pet.name} Lv.${pet.level}` : 'Pet Partner',
+      subtitle: pet ? `${pet.name} Lv.${pet.level}` : '陪伴学习',
       color: 'var(--vermillion)',
       progress: null,
       total: null,
@@ -130,7 +124,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="label-text">読み込み中…</div>
+        <div className="label-text">加载中…</div>
       </div>
     );
   }
@@ -143,23 +137,22 @@ export default function Home() {
           <Link href="/" className="flex items-baseline gap-2">
             <span className="font-display text-2xl font-medium tracking-tight">kana</span>
             <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
-            <span className="writing-vertical text-[0.65rem] opacity-50 ml-1">日本語</span>
           </Link>
           <nav className="flex items-center gap-4">
             {user ? (
               <>
-                <span className="text-[0.8rem] font-body hidden sm:inline">{user.name}</span>
+                <span className="text-[0.85rem] font-body hidden sm:inline">{user.name}</span>
                 <Link href="/dashboard">
-                  <PixelButton variant="primary" size="sm">Dashboard</PixelButton>
+                  <PixelButton variant="primary" size="sm">进入学习</PixelButton>
                 </Link>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <PixelButton variant="ghost" size="sm">ログイン</PixelButton>
+                  <PixelButton variant="ghost" size="sm">登录</PixelButton>
                 </Link>
                 <Link href="/register">
-                  <PixelButton variant="primary" size="sm">登録</PixelButton>
+                  <PixelButton variant="primary" size="sm">注册</PixelButton>
                 </Link>
               </>
             )}
@@ -181,30 +174,30 @@ export default function Home() {
               <h1 className="heading-xl mb-6">
                 {user ? (
                   <>
-                    おかえり、<br/>
-                    <span className="riso-shift-red">{user.name}</span>さん
+                    欢迎回来,<br />
+                    <span className="riso-shift-red">{user.name}</span>
                   </>
                 ) : (
                   <>
-                    ゼロから始める<br/>
-                    <span style={{ color: 'var(--vermillion)' }}>日本語</span>の旅
+                    从零开始<br />
+                    <span style={{ color: 'var(--vermillion)' }}>学日语</span>的旅程
                   </>
                 )}
               </h1>
 
               <p className="body-text max-w-md opacity-75 mb-6">
                 {user
-                  ? '今日も一歩前進。相棒と一緒に、新しい言葉を覚えよう。'
-                  : 'AI 先生の丁寧な解説と、ピクセルペットとの毎日の学習で、日本語を自然に身につける。'}
+                  ? '今天也向前迈一步,和你的宠物一起学新词。'
+                  : 'AI 老师详细讲解,像素宠物陪伴学习,零基础也能轻松入门。'}
               </p>
 
               {!user && (
                 <div className="flex gap-3">
                   <Link href="/register">
-                    <PixelButton variant="primary">無料で始める →</PixelButton>
+                    <PixelButton variant="primary">免费开始 →</PixelButton>
                   </Link>
                   <Link href="/login">
-                    <PixelButton variant="secondary">ログイン</PixelButton>
+                    <PixelButton variant="secondary">已有账号</PixelButton>
                   </Link>
                 </div>
               )}
@@ -215,9 +208,9 @@ export default function Home() {
               {pet ? (
                 <div className="absolute inset-0 flex flex-col items-end justify-end">
                   <div className="text-right">
-                    <div className="label-text mb-1">今日の相棒</div>
+                    <div className="label-text mb-1 opacity-50">今日伙伴</div>
                     <div className="font-display text-3xl">{pet.name}</div>
-                    <div className="caption-text">Lv. {pet.level} · {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫' : '兎'}</div>
+                    <div className="caption-text">Lv. {pet.level}</div>
                   </div>
                 </div>
               ) : (
@@ -232,15 +225,15 @@ export default function Home() {
           {user && (
             <div className="mt-10 grid grid-cols-3 gap-px bg-[var(--ink)] bg-opacity-15 border-[1.5px] border-[var(--ink)]">
               <div className="bg-[var(--paper)] p-4">
-                <div className="label-text mb-1" style={{ color: 'var(--vermillion)' }}>仮名</div>
+                <div className="label-text mb-1" style={{ color: 'var(--vermillion)' }}>假名</div>
                 <div className="font-display text-2xl tabular-nums">{kanaMastered}<span className="text-[0.8rem] opacity-50">/46</span></div>
               </div>
               <div className="bg-[var(--paper)] p-4">
-                <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>語彙</div>
+                <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>词汇</div>
                 <div className="font-display text-2xl tabular-nums">{vocabMastered}<span className="text-[0.8rem] opacity-50">/11</span></div>
               </div>
               <div className="bg-[var(--paper)] p-4">
-                <div className="label-text mb-1" style={{ color: 'var(--mustard-dark)' }}>文法</div>
+                <div className="label-text mb-1" style={{ color: 'var(--mustard-dark)' }}>语法</div>
                 <div className="font-display text-2xl tabular-nums">{grammarMastered}<span className="text-[0.8rem] opacity-50">/5</span></div>
               </div>
             </div>
@@ -250,8 +243,8 @@ export default function Home() {
         {/* Section Title */}
         <section className="mb-6">
           <div className="flex items-baseline justify-between mb-2">
-            <h2 className="heading-md">学習モジュール</h2>
-            <span className="label-text opacity-50">— 目次</span>
+            <h2 className="heading-md">学习模块</h2>
+            <span className="label-text opacity-50">— 目录</span>
           </div>
           <div className="divider-thick"></div>
         </section>
@@ -273,8 +266,6 @@ export default function Home() {
                   </div>
 
                   <div className="mb-3">
-                    <div className="writing-vertical absolute hidden"></div>
-                    <div className="font-display text-[0.7rem] opacity-50 mb-0.5">{mod.jpTitle}</div>
                     <h3 className="font-display text-lg font-medium leading-tight mb-1">{mod.title}</h3>
                     <p className="caption-text">{mod.subtitle}</p>
                   </div>
@@ -286,7 +277,7 @@ export default function Home() {
                         max={mod.total}
                         variant="vermillion"
                         showLabel
-                        label="進捗"
+                        label="进度"
                       />
                     </div>
                   )}
@@ -302,10 +293,10 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <span className="font-display text-sm">kanaAI</span>
               <span className="h-[12px] w-[1.5px] bg-[var(--ink)]"></span>
-              <span className="caption-text">© 2026 — 毎日少しずつ</span>
+              <span className="caption-text">© 2026 — 每天进步一点点</span>
             </div>
             <div className="flex gap-4 caption-text">
-              <span>Tokyo</span>
+              <span>中文</span>
               <span>·</span>
               <span>日本語</span>
             </div>

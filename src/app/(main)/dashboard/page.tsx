@@ -76,7 +76,7 @@ export default function DashboardPage() {
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="label-text">読み込み中…</div>
+        <div className="label-text">加载中…</div>
       </div>
     );
   }
@@ -103,13 +103,13 @@ export default function DashboardPage() {
             <span className="font-display text-2xl font-medium tracking-tight" style={{ color: 'var(--vermillion)' }}>AI</span>
           </Link>
           <div className="flex items-center gap-4">
-            <PixelBadge variant="ink" filled>LV. {String(userLevel).padStart(2, '0')}</PixelBadge>
+            <PixelBadge variant="ink" filled>Lv. {String(userLevel).padStart(2, '0')}</PixelBadge>
             <div className="flex items-center gap-2">
               <span className="text-[0.85rem] font-body">{user.name}</span>
               <button
                 onClick={handleLogout}
                 className="w-9 h-9 rounded-full border-[1.5px] border-[var(--ink)] flex items-center justify-center hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors"
-                title="ログアウト"
+                title="退出登录"
               >
                 <span className="text-[0.85rem]">↗</span>
               </button>
@@ -121,11 +121,11 @@ export default function DashboardPage() {
       <main className="max-w-5xl mx-auto px-6 py-12">
         {/* Greeting */}
         <section className="mb-12 fade-up">
-          <div className="label-text mb-2">本日 — TODAY</div>
+          <div className="label-text mb-2">今天 — TODAY</div>
           <h1 className="heading-lg mb-2">
-            こんにちは、<span style={{ color: 'var(--vermillion)' }}>{user.name}</span>さん
+            你好,<span style={{ color: 'var(--vermillion)' }}>{user.name}</span>
           </h1>
-          <p className="body-text opacity-70">今日も相棒と一緒に、日本語を学びましょう。</p>
+          <p className="body-text opacity-70">继续学习,和你的宠物一起成长。</p>
         </section>
 
         {/* Main grid: User stats + Pet */}
@@ -133,14 +133,14 @@ export default function DashboardPage() {
           {/* User stats */}
           <div className="lg:col-span-5 fade-up" style={{ animationDelay: '100ms' }}>
             <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="label-text">学習状況</h2>
+              <h2 className="label-text">学习进度</h2>
               <span className="caption-text">STATS</span>
             </div>
             <PixelCard>
               <div className="space-y-6">
                 <div>
                   <div className="flex items-baseline justify-between mb-3">
-                    <span className="font-display text-[0.8rem] opacity-60">EXPERIENCE</span>
+                    <span className="font-display text-[0.8rem] opacity-60">经验值 EXP</span>
                     <span className="font-mono text-[0.85rem] tabular-nums">
                       {userExp}<span className="opacity-40"> / </span>{expToNext}
                     </span>
@@ -152,15 +152,15 @@ export default function DashboardPage() {
 
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <div className="label-text" style={{ color: 'var(--vermillion)' }}>仮名</div>
+                    <div className="label-text" style={{ color: 'var(--vermillion)' }}>假名</div>
                     <div className="font-display text-2xl tabular-nums">{kanaMastered}</div>
                   </div>
                   <div>
-                    <div className="label-text" style={{ color: 'var(--cobalt)' }}>語彙</div>
+                    <div className="label-text" style={{ color: 'var(--cobalt)' }}>词汇</div>
                     <div className="font-display text-2xl tabular-nums">{vocabMastered}</div>
                   </div>
                   <div>
-                    <div className="label-text" style={{ color: 'var(--mustard-dark)' }}>文法</div>
+                    <div className="label-text" style={{ color: 'var(--mustard-dark)' }}>语法</div>
                     <div className="font-display text-2xl tabular-nums">{grammarMastered}</div>
                   </div>
                 </div>
@@ -171,8 +171,8 @@ export default function DashboardPage() {
           {/* Pet */}
           <div className="lg:col-span-7 fade-up" style={{ animationDelay: '180ms' }}>
             <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="label-text">相棒</h2>
-              <Link href="/pet" className="caption-text hover:opacity-100">詳細 →</Link>
+              <h2 className="label-text">我的宠物</h2>
+              <Link href="/pet" className="caption-text hover:opacity-100">详情 →</Link>
             </div>
             {pet ? (
               <PixelCard className="relative overflow-hidden">
@@ -190,13 +190,13 @@ export default function DashboardPage() {
                       <span className="label-text">Lv. {pet.level}</span>
                     </div>
                     <div className="caption-text mb-4">
-                      Stage {pet.evolution} · {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫' : '兎'}
+                      阶段 {pet.evolution} · {pet.species === 'dog' ? '柴犬' : pet.species === 'cat' ? '猫咪' : '兔子'}
                     </div>
 
                     <div className="space-y-3">
                       <div>
                         <div className="flex justify-between items-baseline mb-1.5">
-                          <span className="label-text" style={{ color: 'var(--cobalt)' }}>経験値</span>
+                          <span className="label-text" style={{ color: 'var(--cobalt)' }}>经验</span>
                           <span className="text-[0.7rem] font-mono tabular-nums opacity-60">
                             {pet.exp} <span className="opacity-50">/</span> {getExpForLevel(pet.level)}
                           </span>
@@ -205,7 +205,7 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <div className="flex justify-between items-baseline mb-1.5">
-                          <span className="label-text" style={{ color: 'var(--vermillion)' }}>幸福度</span>
+                          <span className="label-text" style={{ color: 'var(--vermillion)' }}>心情</span>
                           <span className="text-[0.7rem] font-mono tabular-nums opacity-60">{pet.happiness}%</span>
                         </div>
                         <PixelProgress value={pet.happiness} max={100} variant="vermillion" />
@@ -216,7 +216,7 @@ export default function DashboardPage() {
               </PixelCard>
             ) : (
               <PixelCard>
-                <p className="caption-text">相棒を読み込み中…</p>
+                <p className="caption-text">宠物加载中…</p>
               </PixelCard>
             )}
           </div>
@@ -225,8 +225,8 @@ export default function DashboardPage() {
         {/* Modules section title */}
         <section className="mb-6">
           <div className="flex items-baseline justify-between mb-2">
-            <h2 className="heading-md">学習を続ける</h2>
-            <span className="label-text opacity-50">— MODULES</span>
+            <h2 className="heading-md">继续学习</h2>
+            <span className="label-text opacity-50">— 课程</span>
           </div>
           <div className="divider-thick"></div>
         </section>
@@ -240,10 +240,10 @@ export default function DashboardPage() {
                   <span className="font-display text-3xl" style={{ color: 'var(--vermillion)' }}>あ</span>
                   <span className="label-text opacity-50">01</span>
                 </div>
-                <h3 className="font-display text-base font-medium mb-1">仮名</h3>
-                <p className="caption-text mb-3">平仮名 · 片仮名</p>
+                <h3 className="font-display text-base font-medium mb-1">假名</h3>
+                <p className="caption-text mb-3">五十音图</p>
                 <div className="mt-auto">
-                  <PixelProgress value={kanaMastered} max={46} variant="vermillion" showLabel label="進捗" />
+                  <PixelProgress value={kanaMastered} max={46} variant="vermillion" showLabel label="进度" />
                 </div>
               </div>
             </PixelCard>
@@ -253,13 +253,13 @@ export default function DashboardPage() {
             <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="font-display text-3xl" style={{ color: 'var(--cobalt)' }}>言</span>
+                  <span className="font-display text-3xl" style={{ color: 'var(--cobalt)' }}>📖</span>
                   <span className="label-text opacity-50">02</span>
                 </div>
-                <h3 className="font-display text-base font-medium mb-1">語彙</h3>
-                <p className="caption-text mb-3">単語 · Vocabulary</p>
+                <h3 className="font-display text-base font-medium mb-1">词汇</h3>
+                <p className="caption-text mb-3">基础单词</p>
                 <div className="mt-auto">
-                  <PixelProgress value={vocabMastered} max={11} variant="cobalt" showLabel label="進捗" />
+                  <PixelProgress value={vocabMastered} max={11} variant="cobalt" showLabel label="进度" />
                 </div>
               </div>
             </PixelCard>
@@ -269,13 +269,13 @@ export default function DashboardPage() {
             <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="font-display text-3xl" style={{ color: 'var(--mustard-dark)' }}>文</span>
+                  <span className="font-display text-3xl" style={{ color: 'var(--mustard-dark)' }}>📝</span>
                   <span className="label-text opacity-50">03</span>
                 </div>
-                <h3 className="font-display text-base font-medium mb-1">文法</h3>
-                <p className="caption-text mb-3">基礎 · Grammar</p>
+                <h3 className="font-display text-base font-medium mb-1">语法</h3>
+                <p className="caption-text mb-3">入门语法</p>
                 <div className="mt-auto">
-                  <PixelProgress value={grammarMastered} max={5} variant="mustard" showLabel label="進捗" />
+                  <PixelProgress value={grammarMastered} max={5} variant="mustard" showLabel label="进度" />
                 </div>
               </div>
             </PixelCard>
@@ -285,12 +285,12 @@ export default function DashboardPage() {
             <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="font-display text-3xl" style={{ color: 'var(--sage)' }}>話</span>
+                  <span className="font-display text-3xl" style={{ color: 'var(--sage)' }}>💬</span>
                   <span className="label-text opacity-50">04</span>
                 </div>
-                <h3 className="font-display text-base font-medium mb-1">AI 会話</h3>
-                <p className="caption-text mb-3">実践 · Practice</p>
-                <p className="caption-text mt-auto opacity-50">6 シーン</p>
+                <h3 className="font-display text-base font-medium mb-1">AI 对话</h3>
+                <p className="caption-text mb-3">场景练习</p>
+                <p className="caption-text mt-auto opacity-50">6 个场景</p>
               </div>
             </PixelCard>
           </Link>
@@ -299,12 +299,12 @@ export default function DashboardPage() {
             <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="font-display text-3xl" style={{ color: 'var(--ink)' }}>試</span>
+                  <span className="font-display text-3xl" style={{ color: 'var(--ink)' }}>✨</span>
                   <span className="label-text opacity-50">05</span>
                 </div>
-                <h3 className="font-display text-base font-medium mb-1">試験</h3>
-                <p className="caption-text mb-3">確認 · Quiz</p>
-                <p className="caption-text mt-auto opacity-50">総合テスト</p>
+                <h3 className="font-display text-base font-medium mb-1">测验</h3>
+                <p className="caption-text mb-3">巩固所学</p>
+                <p className="caption-text mt-auto opacity-50">综合测试</p>
               </div>
             </PixelCard>
           </Link>
@@ -313,13 +313,11 @@ export default function DashboardPage() {
             <PixelCard className="hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform h-full">
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="font-display text-3xl" style={{ color: 'var(--vermillion)' }}>
-                    {pet ? (pet.species === 'dog' ? '犬' : pet.species === 'cat' ? '猫' : '兎') : '宝'}
-                  </span>
+                  <span className="font-display text-3xl" style={{ color: 'var(--vermillion)' }}>🐾</span>
                   <span className="label-text opacity-50">06</span>
                 </div>
-                <h3 className="font-display text-base font-medium mb-1">相棒</h3>
-                <p className="caption-text mb-3">ペット · Pet</p>
+                <h3 className="font-display text-base font-medium mb-1">宠物</h3>
+                <p className="caption-text mb-3">陪伴学习</p>
                 <p className="caption-text mt-auto opacity-50">
                   {pet ? `${pet.name} · Lv.${pet.level}` : '—'}
                 </p>
@@ -335,7 +333,7 @@ export default function DashboardPage() {
             <span className="h-[12px] w-[1.5px] bg-[var(--ink)] opacity-30"></span>
             <span className="caption-text">© 2026</span>
           </div>
-          <div className="caption-text opacity-50">東京 — 日本語</div>
+          <div className="caption-text opacity-50">中文 · 日本語</div>
         </footer>
       </main>
     </div>
