@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { aiConfig } from '@/lib/ai/config';
 
 // 动态导入AI SDK
 async function getAIModel(provider: string) {
   if (provider === 'anthropic') {
     const { anthropic } = await import('@ai-sdk/anthropic');
-    return anthropic(process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022');
+    return anthropic(aiConfig.anthropic.model, {
+      baseURL: aiConfig.anthropic.baseURL,
+    });
   } else {
     const { openai } = await import('@ai-sdk/openai');
-    return openai(process.env.OPENAI_MODEL || 'gpt-4o');
+    return openai(aiConfig.openai.model, {
+      baseURL: aiConfig.openai.baseURL,
+    });
   }
 }
 
@@ -15,7 +20,7 @@ export async function POST(request: NextRequest) {
   try {
     const { messages, systemPrompt, provider } = await request.json();
 
-    const aiProvider = provider || process.env.AI_PROVIDER || 'anthropic';
+    const aiProvider = provider || aiConfig.provider;
     const model = await getAIModel(aiProvider);
 
     const { streamText } = await import('ai');

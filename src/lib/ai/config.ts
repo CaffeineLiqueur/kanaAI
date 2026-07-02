@@ -2,10 +2,12 @@ export const aiConfig = {
   provider: (process.env.AI_PROVIDER || 'anthropic') as 'anthropic' | 'openai',
   anthropic: {
     apiKey: process.env.ANTHROPIC_API_KEY || '',
+    baseURL: process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com',
     model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022',
   },
   openai: {
     apiKey: process.env.OPENAI_API_KEY || '',
+    baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
     model: process.env.OPENAI_MODEL || 'gpt-4o',
   },
 };
