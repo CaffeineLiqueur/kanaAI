@@ -1,235 +1,148 @@
-# kanaAI — AI 日语学习应用
+# kanaAI 🐾
 
-> 从零开始,和一只像素宠物一起学日语。
-> 「和风 Riso 印刷」视觉风格的 Web 应用,集成 AI 老师、艾宾浩斯复习、宠物养成。
+> 零基础学日语,顺便养只像素宠物。
+> AI 老师讲到你懂,宠物陪你熬过五十音。
 
-![Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19](https://img.shields.io/badge/React-19-blue) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-06B6D4) ![Prisma 7](https://img.shields.io/badge/Prisma-7-2D3748) ![License](https://img.shields.io/badge/license-MIT-green)
+![Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19](https://img.shields.io/badge/React-19-blue) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-06B6D4) ![Prisma 7](https://img.shields.io/badge/Prisma-7-2D3748) ![MIT](https://img.shields.io/badge/license-MIT-green)
 
-## ✨ 功能
+## 这是啥?
 
-### 📚 学习模块
-- **假名学习** — 平假名 / 片假名图鉴式收集
-- **词汇** — 基础单词卡片 + 艾宾浩斯遗忘曲线复习
-- **语法** — AI 生成由浅入深的语法讲解
-- **AI 对话** — 场景化日语对话(自我介绍、餐厅、购物……),AI 老师实时纠错
-- **智能测验** — 选择 / 填空 / 罗马音标注 / 翻译题,系统记录错题本
+一个给中文母语者的日语学习 Web 应用:
 
-### 🐾 宠物系统
-- 领养柴犬 / 猫咪 / 兔子同伴
-- 学习获得经验值,宠物升级、3 阶段进化(幼年 → 成长 → 成年)
-- 喂食、摸摸、睡觉互动
-- 3 阶段经验曲线:`expToNext = ⌊100 × 1.5^(level - 1)⌋`,Lv 11 / Lv 26 触发进化
+- 🈶 **假名** — 平假名片假名图鉴式收集
+- 📖 **词汇** — 卡片翻转 + 艾宾浩斯该忘的时候让你忘
+- 📝 **语法** — AI 给你讲得明明白白,顺便造几个例句
+- 💬 **AI 对话** — 选个场景(自我介绍 / 餐厅 / 购物…),AI 陪你练,说错了温柔地纠
+- ✨ **测验** — 选择 / 填空 / 罗马音标注 / 翻译,系统默默给你记账
+- 🐶 **宠物** — 柴犬 / 猫 / 兔子随便领养一只,学习涨经验,它就升级进化
 
-### 🔊 语音合成
-- 通过 [VOICEVOX](https://voicevox.hiroshiba.jp/) 引擎合成日语朗读
-- 支持扬声器选择(由后端 `/api/tts/speakers` 拉取)
+> 设计走的是「和风 Riso 印刷」—— 暖白纸、硬边阴影、错版味儿。不是那种满屏像素宝可梦,现在更安静一点。
 
-### 👤 账号系统
-- 邮箱 + 密码注册 / 登录(bcrypt)
-- 自建 JWT 会话(HS256,`jose` 签名),HttpOnly Cookie
-- "记住我" 选项:勾选 → 30 天持久 Cookie;不勾选 → 浏览器关闭即失效
+## 一行命令跑起来
 
-## 🛠 技术栈
-
-| 层 | 选型 |
-| --- | --- |
-| 框架 | Next.js 16.2(App Router) + React 19 |
-| 语言 | TypeScript 5 |
-| 样式 | Tailwind CSS 4 + 「和风 Riso」自定义主题(朱红 / 钴蓝 / 芥末 / 鼠尾草) |
-| 数据库 | PostgreSQL 16(脚本会启动 Docker 容器,宿主机 5433 端口) |
-| ORM | Prisma 7 + `@prisma/adapter-pg` |
-| AI | Vercel AI SDK 6(`@ai-sdk/anthropic` / `@ai-sdk/openai`),支持自定义 `baseURL` |
-| 认证 | 自建 JWT + bcryptjs(用 `jose` 签发) |
-| 动画 | Framer Motion |
-| 状态 | Zustand |
-| 字体 | Shippori Antique(日文显示) / Noto Sans SC(中文正文) / JetBrains Mono / Klee One |
-
-## 🚀 快速开始
-
-> 推荐方式:一条命令完成「启动 PostgreSQL 容器 → 跑迁移 → 灌种子数据 → 启动 Next.js」。
-
-### 一键启动(推荐)
-
-需要本机已安装并运行 [Docker Desktop](https://www.docker.com/products/docker-desktop/)。
+前提:装了 [Docker Desktop](https://www.docker.com/products/docker-desktop/)。
 
 ```bash
-# macOS / Linux
+# mac / linux
 bash scripts/dev.sh
 
-# Windows
+# windows
 scripts\dev.bat
 ```
 
-脚本会做这些事:
+脚本会帮你:
+1. 把 Docker Desktop 喊起来(如果你忘了)
+2. 起一个 PostgreSQL 容器(`kanaai-postgres`,端口 5433)
+3. 跑迁移、灌种子
+4. `npm run dev` 启动
 
-1. 检查 Docker,必要时启动 Docker Desktop
-2. 启动 `kanaai-postgres` 容器(端口 5433)
-3. 等待 PostgreSQL 就绪
-4. 跑 `prisma migrate dev`(如果还没有迁移)
-5. 检查种子数据(没有就跑 `prisma/seed.ts`)
-6. 启动 `npm run dev`
+跑起来之后:
+- 🌐 <http://localhost:3000>
+- 👤 测试账号:`dev@kanaai.local` / `dev12345678`(已经有一只叫 ハチ 的柴犬在等你)
 
-启动后:
-
-- 应用:<http://localhost:3000>
-- 开发账号:`dev@kanaai.local` / `dev12345678`
-
-### 手动启动
+## 想自己折腾?
 
 ```bash
-# 1. 安装依赖
 npm install
+cp .env.example .env   # 填上 ANTHROPIC_API_KEY 或 OPENAI_API_KEY
 
-# 2. 准备 PostgreSQL(任选其一)
-#    方式 A:用项目自带的容器
+# 起个 Postgres,改 DATABASE_URL 指过去
 docker run -d --name kanaai-postgres \
   -e POSTGRES_USER=kanaai -e POSTGRES_PASSWORD=test123 -e POSTGRES_DB=kanaai \
   -p 5433:5432 postgres:16-alpine
 
-#    方式 B:用自己的实例,改 .env 里的 DATABASE_URL 即可
-
-# 3. 复制环境变量
-cp .env.example .env
-# 填入 ANTHROPIC_API_KEY / OPENAI_API_KEY(以及可选的 *BASE_URL)
-
-# 4. 数据库迁移 + 种子
 npm run db:migrate
 npm run db:seed
-
-# 5. 启动开发服务器
 npm run dev
 ```
 
-### 常用脚本
-
-| 命令 | 作用 |
-| --- | --- |
-| `npm run dev` | 启动开发服务器 |
-| `npm run build` | 生产构建 |
-| `npm run start` | 启动生产服务 |
-| `npm run lint` | ESLint 检查 |
-| `npm run db:migrate` | `prisma migrate dev` |
-| `npm run db:seed` | 灌入种子数据 |
-| `npm run db:studio` | 打开 Prisma Studio |
-
-## ⚙️ 环境变量
-
-`.env` 需要至少以下几项:
+`.env` 里能配的:
 
 ```env
-# AI(二选一或都填,默认用 anthropic)
-AI_PROVIDER=anthropic
+AI_PROVIDER=anthropic            # 或者 openai
 ANTHROPIC_API_KEY=...
-ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
-# 可选:代理到第三方(火山方舟 / 中转站等)
-ANTHROPIC_BASE_URL=https://...
-
+ANTHROPIC_BASE_URL=...            # 想走火山方舟 / 中转?填这里
 OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-4o
-OPENAI_BASE_URL=https://api.openai.com/v1
-
-# 数据库
-DATABASE_URL=postgresql://kanaai:test123@localhost:5433/kanaai
-
-# JWT 签名密钥(生产环境务必改!)
-NEXTAUTH_SECRET=...
-
-# 可选:VOICEVOX 引擎(默认 http://localhost:50027)
-VOICEVOX_ENGINE_URL=...
+VOICEVOX_ENGINE_URL=...           # 不填默认 http://localhost:50027
 ```
 
-> AI 路由对火山方舟 /api/coding 这类不带 `/v1` 的 `baseURL` 做了自动补全,并对响应中缺失 `signature` 的 `thinking` content block 注入了桩字段,避免 SDK 解析失败。
+> AI 路由对火山方舟 / 中转 API 做了点适配:自动补 `/v1`,给不带 signature 的 thinking block 打补丁,免得 SDK 解析炸了。
 
-## 📁 项目结构
+## 怎么造宠物升级?
+
+宠物有 4 个动作,写在 [src/app/api/pet/route.ts](src/app/api/pet/route.ts):
+
+| 动作 | 干啥 |
+| --- | --- |
+| `feed` | 饱腹度 -20,心情 +10 |
+| `pet` | 心情 +15(就是摸一下) |
+| `sleep` | 饱腹度 +10(睡了就不饿了?) |
+| `study` | 加经验,可能升级;升级到 Lv 11 / Lv 26 时触发进化 |
+
+经验曲线:`expToNext = ⌊100 × 1.5^(level - 1)⌋`。也就是说从 Lv 1 升到 2 要 100 EXP,升到 3 要 150,升到 4 要 225……指数增长,后面越来越难。
+
+## 技术栈(给好奇心重的人)
+
+| | |
+| --- | --- |
+| 框架 | Next.js 16 App Router + React 19 |
+| 语言 | TypeScript 5 |
+| 样式 | Tailwind 4 + 「和风 Riso」主题 |
+| 数据库 | PostgreSQL 16 + Prisma 7(用 `@prisma/adapter-pg`) |
+| AI | Vercel AI SDK 6(Anthropic / OpenAI 都能接) |
+| 认证 | 自己撸的 JWT(`jose` 签 HS256)+ bcrypt |
+| 语音 | VOICEVOX 代理 |
+| 动画 | Framer Motion |
+| 状态 | Zustand |
+| 字体 | Shippori Antique(日文)+ Noto Sans SC(中文)+ JetBrains Mono + Klee One |
+
+## 项目长啥样
 
 ```
 src/
 ├── app/
-│   ├── (auth)/
-│   │   ├── login/                 # 登录页
-│   │   └── register/              # 注册页
+│   ├── (auth)/              登录 / 注册
 │   ├── (main)/
-│   │   ├── dashboard/             # 学习仪表板
-│   │   ├── kana/                  # 假名学习
-│   │   ├── vocabulary/            # 词汇
-│   │   ├── grammar/               # 语法
-│   │   ├── practice/              # AI 对话练习
-│   │   ├── quiz/                  # 智能测验
-│   │   └── pet/                   # 宠物系统
-│   ├── api/
-│   │   ├── auth/                  # login / register / logout / me
-│   │   ├── ai/chat/               # 通用 AI 对话(Vercel AI SDK)
-│   │   ├── pet/                   # GET 当前宠物 / PUT 动作(feed/pet/study/sleep)
-│   │   ├── progress/              # 学习进度
-│   │   ├── vocab-progress/        # 词汇掌握度(艾宾浩斯)
-│   │   ├── quiz/                  # 测验结果
-│   │   └── tts/                   # VOICEVOX 代理 + speakers
-│   ├── home-view.tsx              # 公开首页(已登录用户被服务端重定向到 /dashboard)
-│   ├── layout.tsx
-│   ├── globals.css                # Tailwind 4 主题
-│   └── pixel-theme.css            # 「和风 Riso」主题变量 & 字体
-├── components/
-│   ├── ui/                        # PixelButton / PixelCard / PixelProgress / Logo / SpeakerSelector / …
-│   └── Providers.tsx
+│   │   ├── dashboard/       仪表板
+│   │   ├── kana/            假名
+│   │   ├── vocabulary/      词汇
+│   │   ├── grammar/         语法
+│   │   ├── practice/        AI 对话
+│   │   ├── quiz/            测验
+│   │   └── pet/             宠物
+│   ├── api/                 auth / ai/chat / pet / progress / vocab-progress / quiz / tts
+│   ├── home-view.tsx        公开首页(已登录自动跳到 /dashboard)
+│   └── pixel-theme.css      Riso 配色 + 字体
+├── components/ui/           PixelButton / PixelCard / Logo / SpeakerSelector / …
 ├── lib/
-│   ├── auth.ts                    # bcrypt + 会话 cookie
-│   ├── jwt.ts                     # jose HS256 签发 / 解析
-│   ├── prisma.ts                  # PrismaClient 单例
-│   ├── ai/config.ts               # AI provider + 系统提示词
-│   ├── tts/                       # TTS Context + useTTS hook
-│   └── utils.ts
-├── generated/prisma/              # `prisma generate` 产物(Prisma 7 client 输出)
-└── middleware.ts
+│   ├── auth.ts              bcrypt + 会话 cookie
+│   ├── jwt.ts               jose 签发 / 解析
+│   ├── ai/config.ts         AI provider + 系统提示词
+│   └── tts/                 VOICEVOX Context
+└── generated/prisma/        prisma generate 产物(Prisma 7 输出在这里)
 
 prisma/
-├── schema.prisma                  # User / Pet / Progress / VocabProgress / QuizResult
-├── seed.ts                        # 灌入 dev 用户 + 宠物 + 进度
-└── migrations/                    # 迁移历史
+├── schema.prisma            User / Pet / Progress / VocabProgress / QuizResult
+├── seed.ts                  灌 dev 用户 + 宠物 + 进度
+└── migrations/
 
 scripts/
-├── dev.sh                         # Linux / macOS 一键启动
-├── dev.bat                        # Windows 一键启动
-├── optimize-images.js
-└── replace-logo.js
-
-public/
-└── img/                           # Logo 等静态资源
+├── dev.sh                   linux/mac 一键启动
+└── dev.bat                  windows 一键启动
 ```
 
-## 🗂 数据模型(Prisma)
+## 已经做好的 / 还在路上的
 
-| 模型 | 关键字段 |
-| --- | --- |
-| `User` | `email` unique,`password`(bcrypt),一对多关联 `Pet` / `Progress` / `VocabProgress` / `QuizResult` |
-| `Pet` | `species`、`level`、`exp`、`happiness`、`hunger`、`evolution`、String[] `accessories` |
-| `Progress` | `(userId, module, itemId)` 唯一,`mastered` + `reviewAt`(艾宾浩斯) |
-| `VocabProgress` | `(userId, wordId)` 唯一,`level` 0–5 掌握度,`correctCount` / `wrongCount` |
-| `QuizResult` | `type` / `score` / `total` + `details` JSON |
+- [x] 认证、首页、所有学习页面
+- [x] 宠物系统(等级 / 进化 / 互动)
+- [x] 艾宾浩斯数据结构
+- [x] AI 对话 + TTS
+- [x] 一键启动脚本
+- [x] Prisma 持久化 + 种子
+- [ ] 像素宠物精灵图(现在还是 emoji 占位)
+- [ ] 音效 / BGM
+- [ ] 部署上线
 
-## 🎨 设计语言
+## 提个 issue / PR?
 
-- **风格**:和风 Riso 印刷感 — 暖白纸(FAF7F2)+ 硬边阴影、轻微错版效果、衬线显示字(Shippori Antique)
-- **配色**:朱红 `#C8102E` · 钴蓝 `#1E3A8A` · 芥末 `#D4A04A` · 鼠尾草 `#5B7553` · 墨 `#0F0F1A`
-- **字体**:中文优先 Noto Sans SC,日文片段自动回退到 Shippori Antique(浏览器按字符挑选)
-- **组件**:`PixelButton` / `PixelCard` / `PixelBadge` / `PixelDialog` / `PixelInput` / `PixelProgress` / `PlayButton` / `SpeakerSelector` / `Logo`
-
-## ✅ 已完成 / 🛠 进行中
-
-- [x] 项目初始化 + 主题系统
-- [x] 基础 UI 组件库
-- [x] 自建 JWT 认证(注册 / 登录 / 登出 / `/me`)
-- [x] 首页(已登录用户自动重定向到 Dashboard)
-- [x] Dashboard · Kana · Vocabulary · Grammar · Practice · Quiz · Pet 页面骨架
-- [x] 宠物互动动作:`feed` / `pet` / `study` / `sleep`
-- [x] 艾宾浩斯词汇复习数据结构
-- [x] AI 对话接口(Anthropic / OpenAI,可换 `baseURL`)
-- [x] VOICEVOX TTS 代理
-- [x] 一键启动脚本(Docker + 迁移 + 种子 + dev)
-- [x] Prisma 数据库持久化 + 种子数据
-- [ ] 像素宠物精灵图(当前为 emoji 占位)
-- [ ] 音效 / 背景音乐
-- [ ] 部署到 Vercel / Fly.io
-
-## 📝 License
-
-MIT
+来吧。学日语这事儿一个人学太孤单,代码也是。
