@@ -4,7 +4,7 @@ import { verifyPassword, createSession } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const { email, password, remember } = await request.json()
 
     if (!email || !password) {
       return NextResponse.json(
@@ -35,8 +35,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create session
-    await createSession(user.id)
+    // Create session — respect the "remember me" flag from the client.
+    // Default to true to preserve prior behavior for any caller that omits it.
+    await createSession(user.id, remember !== false)
 
     return NextResponse.json({
       user: {

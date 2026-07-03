@@ -6,7 +6,11 @@ import { encrypt, decrypt } from './jwt'
 export { encrypt, decrypt }
 
 const COOKIE_NAME = 'kanaai_session'
-const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000 // 7 days
+// "Remember me": persistent cookie kept across browser restarts.
+const REMEMBER_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000 // 30 days
+// No "remember me": session cookie — dies when the browser closes.
+// JWT itself is still bounded (see jwt.ts) so a stolen cookie can't live forever.
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000 // 24h JWT lifetime cap
 
 // --- Password ---
 
@@ -20,15 +24,18 @@ export async function verifyPassword(password: string, hash: string) {
 
 // --- Session Cookies ---
 
-export async function createSession(userId: string) {
-  const expiresAt = new Date(Date.now() + COOKIE_MAX_AGE)
-  const session = await encrypt({ userId, expiresAt })
+export async function createSession(userId: string, remember: boolean = true) {
+  const maxAgeMs = remember ? REMEMBER_MAX_AGE_MS : SESSION_MAX_AGE_MS
+  const expiresAt = new Date(Date.now() + maxAgeMs)
+  const session = await encrypt({ userId, expiresAt }, remember)
   const cookieStore = await cookies()
 
   cookieStore.set(COOKIE_NAME, session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    expires: expiresAt,
+    // If remember is true → persistent cookie with expires.
+    // If false → omit expires so the cookie is a session cookie (cleared on browser close).
+    ...(remember ? { expires: expiresAt } : {}),
     sameSite: 'lax',
     path: '/',
   })

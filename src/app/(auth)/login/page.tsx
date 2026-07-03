@@ -9,6 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,7 +22,7 @@ export default function LoginPage() {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, remember }),
       });
 
       const data = await response.json();
@@ -108,7 +109,12 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between pt-2">
               <label className="flex items-center gap-2 text-[0.75rem] font-mono opacity-60 cursor-pointer">
-                <input type="checkbox" className="w-3.5 h-3.5 border-[1.5px] border-[var(--ink)] accent-[var(--vermillion)]" />
+                <input
+                  type="checkbox"
+                  className="w-3.5 h-3.5 border-[1.5px] border-[var(--ink)] accent-[var(--vermillion)]"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
                 <span className="uppercase tracking-wider">ログイン状態を保持</span>
               </label>
               <a href="#" className="text-[0.75rem] font-mono opacity-50 hover:opacity-100 transition-opacity">
