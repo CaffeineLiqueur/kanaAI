@@ -1,9 +1,20 @@
 # kanaAI 🐾
 
-> 零基础学日语,顺便养只像素宠物。
-> AI 老师讲到你懂,宠物陪你熬过五十音。
+<p align="center">
+  <img src="public/brand/wordmark.png" alt="kanaAI" width="280" />
+</p>
 
-![Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19](https://img.shields.io/badge/React-19-blue) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-06B6D4) ![Prisma 7](https://img.shields.io/badge/Prisma-7-2D3748) ![MIT](https://img.shields.io/badge/license-MIT-green)
+<p align="center">
+  <em>零基础学日语,顺便养只像素宠物。<br/>AI 老师讲到你懂,宠物陪你熬过五十音。</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/React-19-blue" alt="React 19" />
+  <img src="https://img.shields.io/badge/Tailwind-4-06B6D4" alt="Tailwind 4" />
+  <img src="https://img.shields.io/badge/Prisma-7-2D3748" alt="Prisma 7" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT" />
+</p>
 
 ## 这是啥?
 
@@ -132,6 +143,10 @@ scripts/
 ```
 
 ## 已经做好的 / 还在路上的
+
+<p align="center">
+  <img src="public/brand/mark.png" alt="kanaAI mascot" width="160" />
+</p>
 
 - [x] 认证、首页、所有学习页面
 - [x] 宠物系统(等级 / 进化 / 互动)
