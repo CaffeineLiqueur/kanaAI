@@ -1,6 +1,9 @@
 # kanaAI 🐾
 
 <p align="center">
+  <img src="public/brand/mark.png" alt="kanaAI" width="280" />
+</p>
+<p align="center">
   <img src="public/brand/wordmark.png" alt="kanaAI" width="280" />
 </p>
 
@@ -49,13 +52,13 @@ scripts\dev.bat
 
 跑起来之后:
 - 🌐 <http://localhost:3000>
-- 👤 测试账号:`dev@kanaai.local` / `dev12345678`(已经有一只叫 ハチ 的柴犬在等你)
+- 👤 本地种子账号由 `.env` 中的 `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` 配置(已经有一只叫 ハチ 的柴犬在等你)
 
 ## 想自己折腾?
 
 ```bash
 npm install
-cp .env.example .env   # 填上 ANTHROPIC_API_KEY 或 OPENAI_API_KEY
+cp .env.example .env   # 填上 API Key、NEXTAUTH_SECRET 和本地种子账号配置
 
 # 起个 Postgres,改 DATABASE_URL 指过去
 docker run -d --name kanaai-postgres \
@@ -75,6 +78,8 @@ ANTHROPIC_API_KEY=...
 ANTHROPIC_BASE_URL=...            # 想走火山方舟 / 中转?填这里
 OPENAI_API_KEY=...
 VOICEVOX_ENGINE_URL=...           # 不填默认 http://localhost:50027
+SEED_USER_EMAIL=...                # 仅本地 seed 使用
+SEED_USER_PASSWORD=...             # 仅本地 seed 使用,至少 12 位
 ```
 
 > AI 路由对火山方舟 / 中转 API 做了点适配:自动补 `/v1`,给不带 signature 的 thinking block 打补丁,免得 SDK 解析炸了。
@@ -143,10 +148,6 @@ scripts/
 ```
 
 ## 已经做好的 / 还在路上的
-
-<p align="center">
-  <img src="public/brand/mark.png" alt="kanaAI mascot" width="160" />
-</p>
 
 - [x] 认证、首页、所有学习页面
 - [x] 宠物系统(等级 / 进化 / 互动)

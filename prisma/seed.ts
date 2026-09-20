@@ -13,15 +13,26 @@ const prisma = new PrismaClient({ adapter })
 async function main() {
   console.log('🌱 Seeding database...')
 
-  // Create dev user
-  const hashedPassword = await bcrypt.hash('dev12345678', 10)
+  const seedUserName = process.env.SEED_USER_NAME || '开发者'
+  const seedUserEmail = process.env.SEED_USER_EMAIL
+  const seedUserPassword = process.env.SEED_USER_PASSWORD
+
+  if (!seedUserEmail || !seedUserPassword || /^replace_with_|^your_/i.test(seedUserPassword)) {
+    throw new Error('Set SEED_USER_EMAIL and a local-only SEED_USER_PASSWORD before running the seed script')
+  }
+
+  if (seedUserPassword.length < 12) {
+    throw new Error('SEED_USER_PASSWORD must contain at least 12 characters')
+  }
+
+  const hashedPassword = await bcrypt.hash(seedUserPassword, 10)
 
   const devUser = await prisma.user.upsert({
-    where: { email: 'dev@kanaai.local' },
+    where: { email: seedUserEmail },
     update: {},
     create: {
-      name: '开发者',
-      email: 'dev@kanaai.local',
+      name: seedUserName,
+      email: seedUserEmail,
       password: hashedPassword,
     },
   })
@@ -147,9 +158,7 @@ async function main() {
   console.log('✅ Created sample quiz result')
 
   console.log('\n🎉 Seeding completed!')
-  console.log('\nDev user credentials:')
-  console.log('  Email:    dev@kanaai.local')
-  console.log('  Password: dev12345678')
+  console.log('Seed user configured from SEED_USER_* environment variables.')
 }
 
 main()

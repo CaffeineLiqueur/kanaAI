@@ -98,7 +98,7 @@ echo   kanaAI 已就绪
 echo.
 echo   数据库: postgresql://kanaai:***@localhost:%POSTGRES_PORT%/%DB_NAME%
 echo   应用:   http://localhost:3000
-echo   测试账号: dev@kanaai.local / dev12345678
+echo   种子账号: 由 SEED_USER_EMAIL / SEED_USER_PASSWORD 配置
 echo.
 echo   按 Ctrl+C 停止开发服务器
 echo ========================================

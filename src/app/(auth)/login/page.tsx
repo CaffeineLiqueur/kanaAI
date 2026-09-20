@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PixelButton, PixelInput, PixelBadge, Logo } from '@/components/ui';
+import { PixelButton, PixelInput, Logo } from '@/components/ui';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,35 +37,6 @@ export default function LoginPage() {
       setError('ネットワークエラー');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleDevBypass = async () => {
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'dev@kanaai.local', password: 'dev12345678' }),
-      });
-
-      if (response.ok) {
-        router.push('/dashboard');
-        return;
-      }
-
-      const regResponse = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: '開発者',
-          email: 'dev@kanaai.local',
-          password: 'dev12345678',
-        }),
-      });
-
-      if (regResponse.ok) router.push('/dashboard');
-    } catch {
-      setError('開発者ログインに失敗');
     }
   };
 
@@ -132,22 +103,6 @@ export default function LoginPage() {
               {isLoading ? 'ログイン中…' : 'ログイン →'}
             </PixelButton>
           </form>
-
-          {/* Dev bypass */}
-          <div className="mt-8 pt-6 border-t-[1px] border-[var(--ink)] border-opacity-15">
-            <button
-              onClick={handleDevBypass}
-              className="w-full text-left p-4 border-[1.5px] border-dashed border-[var(--ink)] border-opacity-30 hover:border-opacity-80 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>開発モード</div>
-                  <div className="font-display text-sm">開発者ログインをスキップ</div>
-                </div>
-                <span className="text-[1.2rem]">→</span>
-              </div>
-            </button>
-          </div>
 
           {/* Register link */}
           <div className="mt-8 text-center">

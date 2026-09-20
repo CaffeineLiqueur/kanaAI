@@ -127,7 +127,7 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 echo -e "${GREEN}  kanaAI 已就绪:${NC}"
 echo -e "${GREEN}    数据库: postgresql://kanaai:***@localhost:${POSTGRES_PORT}/${DB_NAME}${NC}"
 echo -e "${GREEN}    应用:   http://localhost:3000${NC}"
-echo -e "${GREEN}    测试账号: dev@kanaai.local / dev12345678${NC}"
+echo -e "${GREEN}    种子账号: 由 SEED_USER_EMAIL / SEED_USER_PASSWORD 配置${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo
 

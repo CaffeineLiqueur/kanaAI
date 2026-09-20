@@ -47,35 +47,6 @@ export default function RegisterPage() {
     }
   };
 
-  const handleDevBypass = async () => {
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: '開発者',
-          email: 'dev@kanaai.local',
-          password: 'dev12345678',
-        }),
-      });
-
-      if (response.ok) {
-        router.push('/dashboard');
-        return;
-      }
-
-      const loginResponse = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'dev@kanaai.local', password: 'dev12345678' }),
-      });
-
-      if (loginResponse.ok) router.push('/dashboard');
-    } catch {
-      setError('開発者登録に失敗');
-    }
-  };
-
   return (
     <div className="min-h-screen relative z-10 flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
@@ -157,21 +128,6 @@ export default function RegisterPage() {
               {isLoading ? '登録中…' : '登録する →'}
             </PixelButton>
           </form>
-
-          <div className="mt-8 pt-6 border-t-[1px] border-[var(--ink)] border-opacity-15">
-            <button
-              onClick={handleDevBypass}
-              className="w-full text-left p-4 border-[1.5px] border-dashed border-[var(--ink)] border-opacity-30 hover:border-opacity-80 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>開発モード</div>
-                  <div className="font-display text-sm">開発者として登録をスキップ</div>
-                </div>
-                <span className="text-[1.2rem]">→</span>
-              </div>
-            </button>
-          </div>
 
           <div className="mt-8 text-center">
             <p className="caption-text">
