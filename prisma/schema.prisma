@@ -7,70 +7,385 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  password      String
-  createdAt     DateTime  @default(now())
-
-  pet           Pet?
-  progress      Progress[]
-  quizResults   QuizResult[]
-  vocabProgress VocabProgress[]
+enum ActivityType {
+  KANA_TRACE
+  LISTENING_CHOICE
+  MULTIPLE_CHOICE
+  MATCHING
+  ORDERING
+  TEXT_INPUT
+  ERROR_CORRECTION
+  READING
+  CHECKPOINT
 }
 
-model Pet {
+enum ContentSource {
+  CURATED
+  AI
+}
+
+enum ContentStatus {
+  PENDING
+  VALID
+  REJECTED
+  FALLBACK
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum PlanItemKind {
+  REVIEW
+  LESSON
+  PRACTICE
+}
+
+enum PlanItemStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  SKIPPED
+}
+
+enum ReviewRating {
+  AGAIN
+  HARD
+  GOOD
+  EASY
+}
+
+model User {
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  name                String?
+  password            String
+  onboardingCompleted Boolean  @default(false)
+  learningGoal        String   @default("practical-n5")
+  dailyGoalMinutes    Int      @default(15)
+  experienceLevel     String   @default("zero")
+  theme               String   @default("system")
+  fontScale           String   @default("standard")
+  kanaHints           Boolean  @default(true)
+  ttsEnabled          Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  companion      Companion?
+  enrollments    Enrollment[]
+  masteries      ObjectiveMastery[]
+  studySessions  StudySession[]
+  attempts       Attempt[]
+  reviewCards    ReviewCard[]
+  dailyPlanItems DailyPlanItem[]
+  rewardLedger   RewardLedger[]
+  streak         Streak?
+  events         EventLog[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  level       String
+  version     Int      @default(1)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  units       Unit[]
+  enrollments Enrollment[]
+}
+
+model Unit {
+  id               String   @id @default(cuid())
+  courseId         String
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  slug             String
+  title            String
+  description      String
+  order            Int
+  vocabularyTarget Int      @default(0)
+  grammarTopics    String[] @default([])
+
+  lessons Lesson[]
+
+  @@unique([courseId, slug])
+  @@unique([courseId, order])
+}
+
+model Lesson {
+  id              String @id @default(cuid())
+  unitId          String
+  unit            Unit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  slug            String
+  title           String
+  summary         String
+  order           Int
+  durationMinutes Int    @default(12)
+  xpReward        Int    @default(20)
+  fallbackContent Json
+
+  objectives       LearningObjective[]
+  activities       ActivityTemplate[]
+  contentVersions  ContentVersion[]
+  generatedContent GeneratedContent[]
+  enrollments      Enrollment[]       @relation("CurrentLesson")
+  studySessions    StudySession[]
+  dailyPlanItems   DailyPlanItem[]
+
+  @@unique([unitId, slug])
+  @@unique([unitId, order])
+}
+
+model LearningObjective {
+  id          String @id @default(cuid())
+  lessonId    String
+  lesson      Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  code        String @unique
+  title       String
+  description String
+  kind        String
+  order       Int
+
+  activities  ActivityTemplate[]
+  masteries   ObjectiveMastery[]
+  attempts    Attempt[]
+  reviewCards ReviewCard[]
+}
+
+model ActivityTemplate {
+  id           String             @id @default(cuid())
+  lessonId     String
+  lesson       Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  objectiveId  String?
+  objective    LearningObjective? @relation(fields: [objectiveId], references: [id], onDelete: SetNull)
+  type         ActivityType
+  order        Int
+  prompt       String
+  content      Json
+  answer       Json
+  explanation  String
+
+  attempts Attempt[]
+
+  @@unique([lessonId, order])
+}
+
+model ContentVersion {
+  id        String        @id @default(cuid())
+  lessonId  String
+  lesson    Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  version   Int
+  source    ContentSource
+  content   Json
+  createdAt DateTime      @default(now())
+
+  studySessions StudySession[]
+
+  @@unique([lessonId, version])
+}
+
+model Enrollment {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId        String
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  currentLessonId String?
+  currentLesson   Lesson?  @relation("CurrentLesson", fields: [currentLessonId], references: [id], onDelete: SetNull)
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, courseId])
+}
+
+model ObjectiveMastery {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objectiveId     String
+  objective       LearningObjective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  score           Float    @default(0)
+  attempts        Int      @default(0)
+  correctStreak   Int      @default(0)
+  lastPracticedAt DateTime?
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, objectiveId])
+}
+
+model StudySession {
+  id               String          @id @default(cuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId         String?
+  mode             String?
+  activityIds      String[]        @default([])
+  activitySnapshot Json            @default("[]")
+  lesson           Lesson?         @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  contentVersionId String?
+  contentVersion   ContentVersion? @relation(fields: [contentVersionId], references: [id], onDelete: SetNull)
+  status           SessionStatus   @default(ACTIVE)
+  currentStep      Int             @default(0)
+  totalActivities  Int             @default(0)
+  startedAt        DateTime        @default(now())
+  completedAt      DateTime?
+
+  attempts Attempt[]
+}
+
+model Attempt {
+  id                 String             @id @default(cuid())
+  idempotencyKey     String             @unique
+  userId             String
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId          String
+  session            StudySession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  activityTemplateId String?
+  activityTemplate   ActivityTemplate?  @relation(fields: [activityTemplateId], references: [id], onDelete: SetNull)
+  objectiveId        String?
+  objective          LearningObjective? @relation(fields: [objectiveId], references: [id], onDelete: SetNull)
+  answer             Json
+  correct            Boolean
+  score              Float
+  errorType          String?
+  feedback           String
+  createdAt          DateTime           @default(now())
+
+  @@unique([sessionId, activityTemplateId])
+}
+
+model ReviewCard {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objectiveId   String
+  objective     LearningObjective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  due           DateTime @default(now())
+  state         Int      @default(0)
+  stability     Float    @default(0)
+  difficulty    Float    @default(0)
+  elapsedDays   Int      @default(0)
+  scheduledDays Int      @default(0)
+  learningSteps Int      @default(0)
+  reps          Int      @default(0)
+  lapses        Int      @default(0)
+  lastReview    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  logs           ReviewLog[]
+  dailyPlanItems DailyPlanItem[]
+
+  @@unique([userId, objectiveId])
+  @@index([userId, due])
+}
+
+model ReviewLog {
+  id            String       @id @default(cuid())
+  idempotencyKey String       @unique
+  cardId        String
+  card          ReviewCard   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  rating        ReviewRating
+  state         Int
+  due           DateTime
+  stability     Float
+  difficulty    Float
+  elapsedDays   Int
+  scheduledDays Int
+  reviewedAt    DateTime     @default(now())
+}
+
+model GeneratedContent {
+  id            String        @id @default(cuid())
+  lessonId      String
+  lesson        Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  cacheKey      String        @unique
+  promptVersion String
+  model         String
+  locale        String        @default("zh-CN")
+  status        ContentStatus @default(PENDING)
+  content       Json?
+  error         String?
+  latencyMs     Int?
+  expiresAt     DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([lessonId, status])
+}
+
+model DailyPlanItem {
+  id               String         @id @default(cuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planDate         DateTime
+  kind             PlanItemKind
+  status           PlanItemStatus @default(PENDING)
+  order            Int
+  estimatedMinutes Int
+  referenceKey     String
+  snapshot         Json
+  lessonId         String?
+  lesson           Lesson?        @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  reviewCardId     String?
+  reviewCard       ReviewCard?    @relation(fields: [reviewCardId], references: [id], onDelete: SetNull)
+  createdAt        DateTime       @default(now())
+  completedAt      DateTime?
+
+  @@unique([userId, planDate, referenceKey])
+  @@index([userId, planDate, order])
+}
+
+model Companion {
   id          String   @id @default(cuid())
   userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id])
-  name        String
-  species     String   // dog/cat/rabbit
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String   @default("小卡")
   level       Int      @default(1)
   exp         Int      @default(0)
-  happiness   Int      @default(80)
-  hunger      Int      @default(20)
+  mood        Int      @default(80)
   evolution   Int      @default(1)
   accessories String[] @default([])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-model Progress {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  module    String    // kana/vocabulary/grammar
-  itemId    String    // 具体学习项ID
-  mastered  Boolean   @default(false)
-  reviewAt  DateTime? // 下次复习时间（艾宾浩斯）
-  createdAt DateTime  @default(now())
+model RewardLedger {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idempotencyKey String   @unique
+  reason         String
+  exp            Int
+  createdAt      DateTime @default(now())
 
-  @@unique([userId, module, itemId])
+  @@index([userId, createdAt])
 }
 
-model VocabProgress {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  wordId       String
-  level        Int      @default(0) // 0-5 掌握程度
-  nextReview   DateTime
-  correctCount Int      @default(0)
-  wrongCount   Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@unique([userId, wordId])
+model Streak {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  current       Int       @default(0)
+  longest       Int       @default(0)
+  lastStudyDate DateTime?
+  updatedAt     DateTime  @updatedAt
 }
 
-model QuizResult {
+model EventLog {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String
-  score     Int
-  total     Int
-  details   Json     // 题目详情和答案
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String
+  payload   Json     @default("{}")
   createdAt DateTime @default(now())
+
+  @@index([name, createdAt])
+  @@index([userId, createdAt])
 }

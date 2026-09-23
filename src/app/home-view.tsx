@@ -1,208 +1,46 @@
-'use client';
+import Image from 'next/image'
+import Link from 'next/link'
+import { ArrowRight, CalendarCheck, Headphones, Path, Repeat } from '@phosphor-icons/react/dist/ssr'
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { PixelButton, PixelCard, PixelProgress, Logo } from '@/components/ui';
+const features = [
+  { icon: CalendarCheck, title: '今天只做该做的', text: '到期复习、新课和可选练习被整理成 10 到 15 分钟的清单。' },
+  { icon: Path, title: '一条清楚的 N5 路径', text: '12 个单元从假名和发音出发，走到生活场景与综合模拟。' },
+  { icon: Repeat, title: '练过才算掌握', text: '掌握度来自答题证据，FSRS 会在合适的时间把内容带回来。' },
+  { icon: Headphones, title: 'AI 可用，但不依赖 AI', text: '解释和变体可以动态生成，失败时固定课程仍能完整继续。' },
+]
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface Pet {
-  name: string;
-  species: string;
-  level: number;
-  happiness: number;
-}
-
-interface ProgressItem {
-  module: string;
-  itemId: string;
-  mastered: boolean;
-}
-
-interface HomeViewProps {
-  // Server entry has already redirected logged-in users to /dashboard,
-  // so this is always null in normal flow. Kept for testability.
-  initialUser: User | null;
-}
-
-export default function HomeView({ initialUser }: HomeViewProps) {
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [pet, setPet] = useState<Pet | null>(null);
-  const [progress, setProgress] = useState<ProgressItem[]>([]);
-  const [loading, setLoading] = useState(initialUser === null);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const userRes = await fetch('/api/auth/me');
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setUser(userData.user);
-          const [petRes, progressRes] = await Promise.all([
-            fetch('/api/pet'),
-            fetch('/api/progress'),
-          ]);
-          if (petRes.ok) {
-            const petData = await petRes.json();
-            setPet(petData.pet);
-          }
-          if (progressRes.ok) {
-            const progressData = await progressRes.json();
-            setProgress(progressData.progress);
-          }
-        }
-      } catch {}
-      finally { setLoading(false); }
-    }
-    loadData();
-  }, []);
-
-  const kanaMastered = progress.filter(p => p.module === 'kana' && p.mastered).length;
-  const vocabMastered = progress.filter(p => p.module === 'vocabulary' && p.mastered).length;
-  const grammarMastered = progress.filter(p => p.module === 'grammar' && p.mastered).length;
-
-  const modules = [
-    { href: '/kana', icon: 'あ', title: '假名学习', subtitle: '五十音图', color: 'var(--vermillion)', progress: kanaMastered, total: 46 },
-    { href: '/vocabulary', icon: '📖', title: '词汇', subtitle: '基础单词', color: 'var(--cobalt)', progress: vocabMastered, total: 11 },
-    { href: '/grammar', icon: '📝', title: '语法', subtitle: '入门语法', color: 'var(--mustard-dark)', progress: grammarMastered, total: 5 },
-    { href: '/practice', icon: '💬', title: 'AI 对话', subtitle: '场景练习', color: 'var(--sage)', progress: null, total: null },
-    { href: '/quiz', icon: '✨', title: '测验', subtitle: '巩固所学', color: 'var(--ink)', progress: null, total: null },
-    { href: '/pet', icon: '🐾', title: '我的宠物', subtitle: pet ? `${pet.name} Lv.${pet.level}` : '陪伴学习', color: 'var(--vermillion)', progress: null, total: null },
-  ];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="label-text">加载中…</div>
+export default function HomeView() {
+  return <main>
+    <header className="container flex h-20 items-center justify-between">
+      <Link href="/" aria-label="kanaAI 首页"><Image src="/brand/wordmark.png" width={145} height={36} alt="kanaAI" priority /></Link>
+      <nav className="flex items-center gap-2" aria-label="账户导航"><Link className="btn btn-quiet" href="/login">登录</Link><Link className="btn btn-primary" href="/register">免费开始</Link></nav>
+    </header>
+    <section className="container grid min-h-[650px] grid-cols-1 items-center gap-12 py-16 lg:grid-cols-[1.08fr_.92fr]">
+      <div className="max-w-[690px]">
+        <p className="eyebrow mb-5">零基础到 N5</p>
+        <h1 className="text-[clamp(3.1rem,7vw,6.7rem)] font-[780] leading-[.96] tracking-[-.075em]">每天 15 分钟，<br /><span className="text-[var(--accent)]">真正学会</span>日语。</h1>
+        <p className="mt-7 max-w-[590px] text-lg leading-8 text-[var(--muted)]">不是功能拼盘，也不是无尽打卡。kanaAI 为你安排今天最值得学的内容，让课程、练习和复习形成一个闭环。</p>
+        <div className="mt-9 flex flex-wrap items-center gap-3"><Link className="btn btn-primary px-5" href="/register">建立我的学习计划 <ArrowRight size={18} weight="bold" /></Link><Link className="btn btn-secondary" href="#path">查看学习路径</Link></div>
+        <p className="mt-4 text-sm text-[var(--muted)]">3 分钟完成建档，不需要信用卡</p>
       </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen relative z-10">
-      <header className="border-b-[1.5px] border-[var(--ink)] bg-[var(--paper)]">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Logo />
-          <nav className="flex items-center gap-4">
-            {user ? (
-              <>
-                <span className="text-[0.85rem] font-body hidden sm:inline">{user.name}</span>
-                <Link href="/dashboard"><PixelButton variant="primary" size="sm">进入学习</PixelButton></Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login"><PixelButton variant="ghost" size="sm">登录</PixelButton></Link>
-                <Link href="/register"><PixelButton variant="primary" size="sm">注册</PixelButton></Link>
-              </>
-            )}
-          </nav>
+      <div className="relative mx-auto w-full max-w-[500px]">
+        <div className="card relative overflow-hidden p-7 shadow-[var(--shadow)]">
+          <div className="mb-10 flex items-center justify-between"><span className="eyebrow">今日计划</span><span className="status-pill">约 13 分钟</span></div>
+          <div className="space-y-3">
+            <div className="rounded-xl bg-[var(--accent)] p-5 text-white"><p className="text-sm">下一步</p><p className="mt-1 text-xl font-bold">认识第一组假名</p><p className="mt-4 text-sm">目标预告 · 示例 · 练习 · 回忆 · 小结</p></div>
+            <div className="flex items-center justify-between rounded-xl border border-[var(--border)] p-4"><div><p className="font-semibold">到期复习</p><p className="mt-1 text-sm text-[var(--muted)]">8 张卡片</p></div><Repeat size={24} /></div>
+            <div className="flex items-center justify-between rounded-xl border border-dashed border-[var(--border)] p-4 text-[var(--muted)]"><div><p className="font-semibold text-[var(--text)]">听力热身</p><p className="mt-1 text-sm">可选 · 4 分钟</p></div><Headphones size={24} /></div>
+          </div>
         </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-6 py-12">
-        <section className="mb-16 fade-up">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-            <div className="md:col-span-8">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="label-text">EST. 2026</span>
-                <span className="h-[1px] w-12 bg-[var(--ink)] opacity-30"></span>
-                <span className="label-text" style={{ color: 'var(--vermillion)' }}>VOL. 01</span>
-              </div>
-              <h1 className="heading-xl mb-6">
-                {user ? (<>欢迎回来,<br /><span className="riso-shift-red">{user.name}</span></>) : (<>从零开始<br /><span style={{ color: 'var(--vermillion)' }}>学日语</span>的旅程</>)}
-              </h1>
-              <p className="body-text max-w-md opacity-75 mb-6">
-                {user ? '今天也向前迈一步,和你的宠物一起学新词。' : 'AI 老师详细讲解,像素宠物陪伴学习,零基础也能轻松入门。'}
-              </p>
-              {!user && (
-                <div className="flex gap-3">
-                  <Link href="/register"><PixelButton variant="primary">免费开始 →</PixelButton></Link>
-                  <Link href="/login"><PixelButton variant="secondary">已有账号</PixelButton></Link>
-                </div>
-              )}
-            </div>
-            <div className="md:col-span-4 relative h-32 md:h-40 flex items-center justify-end">
-              {pet ? (
-                <div className="flex flex-col items-end">
-                  <div className="text-right">
-                    <div className="label-text mb-1 opacity-50">今日伙伴</div>
-                    <div className="font-display text-3xl">{pet.name}</div>
-                    <div className="caption-text">Lv. {pet.level}</div>
-                  </div>
-                </div>
-              ) : (
-                <Logo size="xl" variant="mark" href="" className="drift" />
-              )}
-            </div>
-          </div>
-
-          {user && (
-            <div className="mt-10 grid grid-cols-3 gap-px bg-[var(--ink)] bg-opacity-15 border-[1.5px] border-[var(--ink)]">
-              <div className="bg-[var(--paper)] p-4">
-                <div className="label-text mb-1" style={{ color: 'var(--vermillion)' }}>假名</div>
-                <div className="font-display text-2xl tabular-nums">{kanaMastered}<span className="text-[0.8rem] opacity-50">/46</span></div>
-              </div>
-              <div className="bg-[var(--paper)] p-4">
-                <div className="label-text mb-1" style={{ color: 'var(--cobalt)' }}>词汇</div>
-                <div className="font-display text-2xl tabular-nums">{vocabMastered}<span className="text-[0.8rem] opacity-50">/11</span></div>
-              </div>
-              <div className="bg-[var(--paper)] p-4">
-                <div className="label-text mb-1" style={{ color: 'var(--mustard-dark)' }}>语法</div>
-                <div className="font-display text-2xl tabular-nums">{grammarMastered}<span className="text-[0.8rem] opacity-50">/5</span></div>
-              </div>
-            </div>
-          )}
-        </section>
-
-        <section className="mb-6">
-          <div className="flex items-baseline justify-between mb-2">
-            <h2 className="heading-md">学习模块</h2>
-            <span className="label-text opacity-50">— 目录</span>
-          </div>
-          <div className="divider-thick"></div>
-        </section>
-
-        <section className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {modules.map((mod, i) => (
-            <Link key={mod.href} href={mod.href} className="block fade-up" style={{ animationDelay: `${i * 60}ms` }}>
-              <PixelCard className="h-full hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform duration-300">
-                <div className="flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="font-display text-3xl font-medium" style={{ color: mod.color }}>{mod.icon}</span>
-                    <span className="label-text opacity-50">No. 0{i + 1}</span>
-                  </div>
-                  <div className="mb-3">
-                    <h3 className="font-display text-lg font-medium leading-tight mb-1">{mod.title}</h3>
-                    <p className="caption-text">{mod.subtitle}</p>
-                  </div>
-                  {mod.progress !== null && mod.total !== null && (
-                    <div className="mt-auto pt-3">
-                      <PixelProgress value={mod.progress} max={mod.total} variant="vermillion" showLabel label="进度" />
-                    </div>
-                  )}
-                </div>
-              </PixelCard>
-            </Link>
-          ))}
-        </section>
-
-        <section className="mt-20 pt-8 border-t-[1.5px] border-[var(--ink)]">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex items-center gap-3">
-              <span className="font-display text-sm">kanaAI</span>
-              <span className="h-[12px] w-[1.5px] bg-[var(--ink)]"></span>
-              <span className="caption-text">© 2026 — 日本語学习好搭子</span>
-            </div>
-            <div className="flex gap-4 caption-text">
-              <span>中文</span><span>·</span><span>日本語</span>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+        <Image className="absolute -bottom-6 -right-3 h-auto w-24 drop-shadow-xl sm:-bottom-12 sm:-right-5 sm:w-[154px]" src="/brand/mark.png" width={154} height={160} alt="kanaAI 猫咪伙伴" priority />
+      </div>
+    </section>
+    <section id="path" className="border-y border-[var(--border)] bg-[var(--surface)] py-24"><div className="container">
+      <p className="eyebrow">学习闭环</p>
+      <div className="mt-4 grid gap-8 lg:grid-cols-[.8fr_1.2fr]"><h2 className="page-title">每天知道下一步，<br />每周看见自己进步。</h2><p className="max-w-2xl text-lg leading-8 text-[var(--muted)]">系统先处理快要遗忘的知识，再开放新课。答错会得到明确反馈，答对会改变掌握度和复习时间，而不是让你手动点一个“已掌握”。</p></div>
+      <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--border)] md:grid-cols-2 lg:grid-cols-4">{features.map(({ icon: Icon, title, text }) => <article key={title} className="bg-[var(--surface)] p-6"><Icon size={28} color="var(--accent)" weight="duotone" /><h3 className="mt-7 font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{text}</p></article>)}</div>
+    </div></section>
+    <section className="container py-24 text-center"><Image className="mx-auto h-auto" src="/brand/mark.png" width={96} height={100} alt="" /><h2 className="mx-auto mt-6 max-w-2xl page-title">今天开始，先把第一步学扎实。</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-[var(--muted)]">选择目标和每天可投入的时间，kanaAI 会生成你的第一份计划。</p><Link className="btn btn-primary mt-8" href="/register">免费开始学习 <ArrowRight size={18} /></Link></section>
+    <footer className="border-t border-[var(--border)] py-8"><div className="container flex flex-wrap items-center justify-between gap-4 text-sm text-[var(--muted)]"><Image src="/brand/wordmark.png" width={116} height={29} alt="kanaAI" /><span>为中文母语的日语学习者设计</span></div></footer>
+  </main>
 }

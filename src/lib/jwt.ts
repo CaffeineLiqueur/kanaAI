@@ -1,9 +1,9 @@
 import { SignJWT, jwtVerify } from 'jose'
 
-const secretKey = process.env.NEXTAUTH_SECRET
+const secretKey = process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET
 
 if (!secretKey || secretKey.length < 32) {
-  throw new Error('NEXTAUTH_SECRET must be set and contain at least 32 characters')
+  throw new Error('SESSION_SECRET must be set and contain at least 32 characters')
 }
 
 const encodedKey = new TextEncoder().encode(secretKey)

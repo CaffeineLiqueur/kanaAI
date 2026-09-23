@@ -1,81 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getSession } from '@/lib/auth'
-import { getReviewInterval } from '@/lib/utils'
 
-// GET - 获取学习进度
-export async function GET(request: NextRequest) {
-  const session = await getSession()
-  if (!session?.userId) {
-    return NextResponse.json({ error: '未登录' }, { status: 401 })
-  }
-
-  const { searchParams } = new URL(request.url)
-  const module = searchParams.get('module') // kana / vocabulary / grammar
-
-  const where: { userId: string; module?: string } = {
-    userId: session.userId,
-  }
-  if (module) {
-    where.module = module
-  }
-
-  const progress = await prisma.progress.findMany({ where })
-
-  return NextResponse.json({ progress })
-}
-
-// POST - 更新学习进度
-export async function POST(request: NextRequest) {
-  const session = await getSession()
-  if (!session?.userId) {
-    return NextResponse.json({ error: '未登录' }, { status: 401 })
-  }
-
-  const { module, itemId, mastered } = await request.json()
-
-  if (!module || !itemId) {
-    return NextResponse.json(
-      { error: '缺少必要参数' },
-      { status: 400 }
-    )
-  }
-
-  // Calculate next review time using Ebbinghaus intervals
-  const existing = await prisma.progress.findUnique({
-    where: {
-      userId_module_itemId: {
-        userId: session.userId,
-        module,
-        itemId,
-      },
-    },
-  })
-
-  const reviewLevel = mastered ? (existing?.mastered ? 1 : 0) : 0
-  const intervalDays = getReviewInterval(reviewLevel)
-  const reviewAt = new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000)
-
-  const progress = await prisma.progress.upsert({
-    where: {
-      userId_module_itemId: {
-        userId: session.userId,
-        module,
-        itemId,
-      },
-    },
-    update: {
-      mastered: mastered ?? undefined,
-      reviewAt,
-    },
-    create: {
-      userId: session.userId,
-      module,
-      itemId,
-      mastered: mastered ?? false,
-      reviewAt,
-    },
-  })
-
-  return NextResponse.json({ progress })
+export async function GET() {
+  const user = await getCurrentUser()
+  if (!user) return NextResponse.json({ error: '未登录' }, { status: 401 })
+  const [masteries, enrollment, streak] = await Promise.all([
+    prisma.objectiveMastery.findMany({ where: { userId: user.id }, include: { objective: { include: { lesson: { include: { unit: true } } } } } }),
+    prisma.enrollment.findFirst({ where: { userId: user.id }, include: { currentLesson: { include: { unit: true } } } }),
+    prisma.streak.findUnique({ where: { userId: user.id } }),
+  ])
+  return NextResponse.json({ masteries, currentUnit: enrollment?.currentLesson?.unit || null, weakObjectives: masteries.filter((item) => item.score < .65).sort((a, b) => a.score - b.score).slice(0, 8), streak })
 }

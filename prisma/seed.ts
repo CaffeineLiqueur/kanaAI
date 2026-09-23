@@ -1,172 +1,92 @@
 import 'dotenv/config'
-import { PrismaClient } from '../src/generated/prisma/client'
+import { PrismaClient, ActivityType, ContentSource } from '../src/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 import bcrypt from 'bcryptjs'
+import { N5_COURSE, N5_VOCABULARY } from '../src/content/curriculum'
+import { stableJson } from '../src/lib/learning/content-version'
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-})
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const prisma = new PrismaClient({ adapter: new PrismaPg(pool) })
+const vocabularyByCode = new Map(N5_VOCABULARY.map((word) => [`N5-WORD-${word.id}`, word]))
+
+async function seedCurriculum() {
+  const course = await prisma.course.upsert({
+    where: { slug: N5_COURSE.slug },
+    update: { title: N5_COURSE.title, description: N5_COURSE.description, version: N5_COURSE.version, published: true },
+    create: { slug: N5_COURSE.slug, title: N5_COURSE.title, description: N5_COURSE.description, level: N5_COURSE.level, version: N5_COURSE.version, published: true },
+  })
+
+  for (const [unitIndex, unitData] of N5_COURSE.units.entries()) {
+    const unit = await prisma.unit.upsert({
+      where: { courseId_slug: { courseId: course.id, slug: unitData.slug } },
+      update: { title: unitData.title, description: unitData.description, order: unitIndex + 1, vocabularyTarget: unitData.vocabularyTarget, grammarTopics: unitData.grammarTopics },
+      create: { courseId: course.id, slug: unitData.slug, title: unitData.title, description: unitData.description, order: unitIndex + 1, vocabularyTarget: unitData.vocabularyTarget, grammarTopics: unitData.grammarTopics },
+    })
+
+    for (const [lessonIndex, lessonData] of unitData.lessons.entries()) {
+      const fallbackContent = { objectiveCode: lessonData.objective.code, explanation: lessonData.explanation, examples: lessonData.examples, activities: lessonData.activities }
+      const lesson = await prisma.lesson.upsert({
+        where: { unitId_slug: { unitId: unit.id, slug: lessonData.slug } },
+        update: { title: lessonData.title, summary: lessonData.summary, order: lessonIndex + 1, durationMinutes: lessonData.durationMinutes, fallbackContent },
+        create: { unitId: unit.id, slug: lessonData.slug, title: lessonData.title, summary: lessonData.summary, order: lessonIndex + 1, durationMinutes: lessonData.durationMinutes, fallbackContent },
+      })
+      const objective = await prisma.learningObjective.upsert({
+        where: { code: lessonData.objective.code },
+        update: { lessonId: lesson.id, ...lessonData.objective, order: 1 },
+        create: { lessonId: lesson.id, ...lessonData.objective, order: 1 },
+      })
+      const existingActivities = await prisma.activityTemplate.findMany({ where: { lessonId: lesson.id }, select: { id: true, order: true }, orderBy: { order: 'asc' } })
+      if (existingActivities.some((activity) => lessonData.activities.findIndex((item) => item.id === activity.id) + 1 !== activity.order)) {
+        for (const [index, activity] of existingActivities.entries()) {
+          await prisma.activityTemplate.update({ where: { id: activity.id }, data: { order: -(index + 1) } })
+        }
+      }
+      for (const [index, activity] of lessonData.activities.entries()) {
+        const word = vocabularyByCode.get(activity.objectiveCode)
+        const activityObjective = word ? await prisma.learningObjective.upsert({
+          where: { code: activity.objectiveCode },
+          update: { lessonId: lesson.id, title: word.japanese, description: `读音：${word.reading}。常见意义：${word.chinese}。`, kind: 'vocabulary', order: index + 2 },
+          create: { lessonId: lesson.id, code: activity.objectiveCode, title: word.japanese, description: `读音：${word.reading}。常见意义：${word.chinese}。`, kind: 'vocabulary', order: index + 2 },
+        }) : objective
+        const data = { lessonId: lesson.id, objectiveId: activityObjective.id, type: activity.type as ActivityType, order: index + 1, prompt: activity.prompt, content: activity.content, answer: activity.answer, explanation: activity.explanation }
+        await prisma.activityTemplate.upsert({ where: { id: activity.id }, update: data, create: { id: activity.id, ...data } })
+      }
+      const latest = await prisma.contentVersion.findFirst({ where: { lessonId: lesson.id }, orderBy: { version: 'desc' } })
+      if (!latest || stableJson(latest.content) !== stableJson(fallbackContent)) {
+        await prisma.contentVersion.create({ data: { lessonId: lesson.id, version: (latest?.version || 0) + 1, content: fallbackContent, source: ContentSource.CURATED } })
+      }
+    }
+  }
+  return course
+}
+
+async function seedOptionalDeveloper(courseId: string) {
+  const email = process.env.SEED_USER_EMAIL
+  const password = process.env.SEED_USER_PASSWORD
+  if (!email || !password) return
+  if (password.length < 12 || /^replace_with_|^your_/i.test(password)) throw new Error('SEED_USER_PASSWORD 必须是至少 12 位的本地开发密码')
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {},
+    create: { email, name: process.env.SEED_USER_NAME || '学习者', password: await bcrypt.hash(password, 10) },
+  })
+  await prisma.companion.upsert({ where: { userId: user.id }, update: {}, create: { userId: user.id } })
+  await prisma.streak.upsert({ where: { userId: user.id }, update: {}, create: { userId: user.id } })
+  const firstLesson = await prisma.lesson.findFirst({ where: { unit: { courseId } }, orderBy: [{ unit: { order: 'asc' } }, { order: 'asc' }] })
+  await prisma.enrollment.upsert({ where: { userId_courseId: { userId: user.id, courseId } }, update: {}, create: { userId: user.id, courseId, currentLessonId: firstLesson?.id } })
+}
 
 async function main() {
-  console.log('🌱 Seeding database...')
-
-  const seedUserName = process.env.SEED_USER_NAME || '开发者'
-  const seedUserEmail = process.env.SEED_USER_EMAIL
-  const seedUserPassword = process.env.SEED_USER_PASSWORD
-
-  if (!seedUserEmail || !seedUserPassword || /^replace_with_|^your_/i.test(seedUserPassword)) {
-    throw new Error('Set SEED_USER_EMAIL and a local-only SEED_USER_PASSWORD before running the seed script')
-  }
-
-  if (seedUserPassword.length < 12) {
-    throw new Error('SEED_USER_PASSWORD must contain at least 12 characters')
-  }
-
-  const hashedPassword = await bcrypt.hash(seedUserPassword, 10)
-
-  const devUser = await prisma.user.upsert({
-    where: { email: seedUserEmail },
-    update: {},
-    create: {
-      name: seedUserName,
-      email: seedUserEmail,
-      password: hashedPassword,
-    },
-  })
-
-  console.log(`✅ Created dev user: ${devUser.name} (${devUser.email})`)
-
-  // Create pet for dev user
-  const pet = await prisma.pet.upsert({
-    where: { userId: devUser.id },
-    update: {},
-    create: {
-      userId: devUser.id,
-      name: 'ハチ',
-      species: 'dog',
-      level: 5,
-      exp: 120,
-      happiness: 85,
-      hunger: 25,
-      evolution: 1,
-    },
-  })
-
-  console.log(`✅ Created pet: ${pet.name} (Lv.${pet.level})`)
-
-  // Create some kana progress
-  const kanaItems = ['あ', 'い', 'う', 'か', 'き']
-  for (const item of kanaItems) {
-    await prisma.progress.upsert({
-      where: {
-        userId_module_itemId: {
-          userId: devUser.id,
-          module: 'kana',
-          itemId: item,
-        },
-      },
-      update: {},
-      create: {
-        userId: devUser.id,
-        module: 'kana',
-        itemId: item,
-        mastered: true,
-        reviewAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      },
-    })
-  }
-
-  console.log(`✅ Created kana progress: ${kanaItems.join(', ')}`)
-
-  // Create some vocabulary progress
-  const vocabItems = [
-    { wordId: '1', level: 3 },
-    { wordId: '2', level: 2 },
-    { wordId: '4', level: 4 },
-    { wordId: '5', level: 5 },
-  ]
-
-  for (const item of vocabItems) {
-    await prisma.vocabProgress.upsert({
-      where: {
-        userId_wordId: {
-          userId: devUser.id,
-          wordId: item.wordId,
-        },
-      },
-      update: {},
-      create: {
-        userId: devUser.id,
-        wordId: item.wordId,
-        level: item.level,
-        nextReview: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-        correctCount: item.level * 2,
-        wrongCount: Math.max(0, 5 - item.level),
-      },
-    })
-  }
-
-  console.log(`✅ Created vocabulary progress for ${vocabItems.length} words`)
-
-  // Create grammar progress
-  const grammarItems = ['1']
-  for (const item of grammarItems) {
-    await prisma.progress.upsert({
-      where: {
-        userId_module_itemId: {
-          userId: devUser.id,
-          module: 'grammar',
-          itemId: item,
-        },
-      },
-      update: {},
-      create: {
-        userId: devUser.id,
-        module: 'grammar',
-        itemId: item,
-        mastered: true,
-        reviewAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
-      },
-    })
-  }
-
-  console.log(`✅ Created grammar progress`)
-
-  // Create a sample quiz result
-  await prisma.quizResult.create({
-    data: {
-      userId: devUser.id,
-      type: 'kana-vocab',
-      score: 4,
-      total: 5,
-      details: {
-        questions: [
-          { question: '「あ」的罗马音是？', answer: 'a', correct: true },
-          { question: '「ありがとう」的意思是？', answer: '谢谢', correct: true },
-          { question: '「水」的读音是？', answer: 'みず', correct: true },
-          { question: '「一」的罗马音是？', answer: 'ichi', correct: true },
-          { question: '「お父さん」的意思是？', answer: '妈妈', correct: false },
-        ],
-        scorePercentage: 80,
-      },
-    },
-  })
-
-  console.log('✅ Created sample quiz result')
-
-  console.log('\n🎉 Seeding completed!')
-  console.log('Seed user configured from SEED_USER_* environment variables.')
+  const course = await seedCurriculum()
+  await seedOptionalDeveloper(course.id)
+  console.log(`课程种子完成：${N5_COURSE.units.length} 个单元`)
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
+  .then(async () => prisma.$disconnect())
+  .catch(async (error) => {
+    console.error(error)
     await prisma.$disconnect()
     process.exit(1)
   })

@@ -69,6 +69,12 @@ export async function getCurrentUser() {
       id: true,
       name: true,
       email: true,
+      onboardingCompleted: true,
+      dailyGoalMinutes: true,
+      theme: true,
+      fontScale: true,
+      kanaHints: true,
+      ttsEnabled: true,
       createdAt: true,
     },
   })

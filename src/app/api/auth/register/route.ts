@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user with initial pet
     const hashedPassword = await hashPassword(password)
 
     const user = await prisma.user.create({
@@ -41,17 +40,12 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        pet: {
+        companion: {
           create: {
-            name: 'ハチ',
-            species: 'dog',
-            level: 1,
-            exp: 0,
-            happiness: 80,
-            hunger: 20,
-            evolution: 1,
+            name: '小卡',
           },
         },
+        streak: { create: {} },
       },
       select: {
         id: true,

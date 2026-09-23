@@ -1,0 +1,45 @@
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: kanaai_test
+          POSTGRES_PASSWORD: local_test_only
+          POSTGRES_DB: kanaai_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kanaai_test -d kanaai_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://kanaai_test:local_test_only@127.0.0.1:5432/kanaai_test
+      E2E_DATABASE_URL: postgresql://kanaai_test:local_test_only@127.0.0.1:5432/kanaai_test
+      SESSION_SECRET: integration_test_secret_with_32_characters
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:run
+      - run: npm run validate:content
+      - run: npm run build
+      - run: npx prisma migrate deploy
+      - run: npm run db:seed
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
